@@ -1,5 +1,19 @@
 {% extends "base.html" %}
 {% load static %}
+
+
+{%block style%}
+.bg-pattern,
+.bg-pattern.angle:before {
+	background:url('{% static "img/dark_wall.png" %}');
+}
+{%endblock %}
+
+{% block navStyle %}
+	nav__holder nav--sticky nav--align-center sticky offset scrolling
+{% endblock %}
+
+
 {% block content %}
 <div class="content-wrap">
     <!-- From Blog -->

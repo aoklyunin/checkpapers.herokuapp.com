@@ -7996,9 +7996,6 @@ a img.aligncenter {
 
 /* Pattern
 -------------------------------------------------------*/
-.bg-pattern,
-.bg-pattern.angle:before {
-	background: url("{{ STATIC_URL }}../img/dark_wall.png"); }
 
 /* Section Dark / Background Image
 -------------------------------------------------------*/

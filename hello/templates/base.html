@@ -22,9 +22,13 @@
 	<link rel="apple-touch-icon" sizes="72x72" href="{% static 'img/apple-touch-icon-72x72.png' %}">
 	<link rel="apple-touch-icon" sizes="114x114" href="{% static 'img/apple-touch-icon-114x114.png' %}">
 
+	<style>
+		{%block style%}
+		{%endblock %}
+	</style>
 </head>
 
-<body data-spy="scroll" data-offset="60" data-target=".nav__holder" id="home" itemscope itemtype="http://schema.org/WebPage">
+<body data-offset="60" data-target=".nav__holder" id="home" itemscope itemtype="http://schema.org/WebPage">
 
 	<!-- Preloader -->
 	<div class="loader-mask">
@@ -36,7 +40,7 @@
 	<!-- Header -->
 	<header class="nav nav--always-fixed" itemtype="http://schema.org/WPHeader" itemscope>
 
-		<div class="nav__holder nav--sticky nav--align-center">
+		<div class="{% block navStyle %}	{% endblock %}">
 			<div class="container-fluid container-semi-fluid">
 				<div class="flex-parent">
 
