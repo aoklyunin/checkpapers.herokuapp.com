@@ -133,28 +133,6 @@ var DEOTHEMES = DEOTHEMES || {};
 					}
 				});
 			});
-		},		
-
-		stickyNavbar: function() {
-			var $navSticky = $('.nav--sticky');
-
-			if ($window.scrollTop() > 190) {
-				$navSticky.addClass('sticky');
-			} else {
-				$navSticky.removeClass('sticky');
-			}
-
-			if ($window.scrollTop() > 200) {
-				$navSticky.addClass('offset');
-			} else {
-				$navSticky.removeClass('offset');
-			}
-
-			if ($window.scrollTop() > 500) {
-				$navSticky.addClass('scrolling');
-			} else {
-				$navSticky.removeClass('scrolling');
-			}
 		},
 
 		mobileNavigation: function() {
@@ -360,7 +338,6 @@ var DEOTHEMES = DEOTHEMES || {};
 
 		init: function() {
 			DEOTHEMES.initialize.scrollToTopScroll();
-			DEOTHEMES.initialize.stickyNavbar();
 		}
 
 	}
