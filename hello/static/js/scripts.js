@@ -210,20 +210,7 @@ var DEOTHEMES = DEOTHEMES || {};
 				}
 			});
 
-			// Single video lightbox
-			$('.single-video-lightbox').magnificPopup({
-				type: 'iframe',
-				closeBtnInside:false,
-				removalDelay: 500,
-				callbacks: {
-					beforeOpen: function() {
-						// just a hack that adds mfp-anim class to markup 
-						this.st.iframe.markup = this.st.iframe.markup.replace('mfp-iframe-scaler', 'mfp-iframe-scaler mfp-with-anim');
-						this.st.mainClass = this.st.el.attr('data-effect');
-					},
-				},
-				fixedContentPos: false,
-			});
+
 		},
 
 		accordions: function() {
