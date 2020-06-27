@@ -1,83 +1,201 @@
-<!DOCTYPE html>
-<html>
+{% load static %}
+
+<html lang="en">
 <head>
-<title>Python Getting Started on Heroku</title>
-  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-  <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-  <style type="text/css">
-    .jumbotron {
-        background: #532f8c;
-        color: white;
-        padding-bottom: 80px
-    }
-    .jumbotron .btn-primary {
-        background: #845ac7;
-        border-color: #845ac7
-    }
-    .jumbotron .btn-primary:hover {
-        background: #7646c1
-    }
-    .jumbotron p {
-        color: #d9ccee;
-        max-width: 75%;
-        margin: 1em auto 2em
-    }
-    .navbar+.jumbotron {
-        margin-top: -20px
-    }
-    .jumbotron .lang-logo {
-        display: block;
-        background: #b01302;
-        border-radius: 50%;
-        overflow: hidden;
-        width: 100px;
-        height: 100px;
-        margin: auto;
-        border: 2px solid white
-    }
-    .jumbotron .lang-logo img {
-        max-width: 100%
-    }
+	<title>Jueve | Creative Agency HTML Template</title>
 
+	<meta charset="utf-8">
+	<!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="description" content="">
 
-  </style>
+	<!-- Google Fonts -->
+	<link href='//fonts.googleapis.com/css?family=DM+Sans:400,400i,500,700' rel='stylesheet'>
+
+	<!-- Css -->
+	<link rel="stylesheet" href="{% static 'css/style.css' %}" />
+	<link rel="stylesheet" href="{% static 'css/custom.css' %}" />
+
+	<!-- Favicons -->
+	<link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+	<link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+	<link rel="apple-touch-icon" sizes="72x72" href="{% static 'img/apple-touch-icon-72x72.png' %}">
+	<link rel="apple-touch-icon" sizes="114x114" href="{% static 'img/apple-touch-icon-114x114.png' %}">
+
 </head>
-<body>
-<nav class="navbar navbar-default navbar-static-top navbar-inverse">
-  <div class="container">
-    <ul class="nav navbar-nav">
-      <li class="active">
-        <a href="/"><span class="glyphicon glyphicon-home"></span> Home</a>
-      </li>
-      <li>
-        <a href="https://devcenter.heroku.com/articles/how-heroku-works"><span class="glyphicon glyphicon-user"></span> How Heroku Works</a>
-      </li>
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="glyphicon glyphicon-info-sign"></span> Getting Started Guides <span class="caret"></span></a>
-          <ul class="dropdown-menu" role="menu">
-            <li><a href="https://devcenter.heroku.com/articles/getting-started-with-ruby">Getting Started with Ruby on Heroku</a></li>
-            <li><a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs">Getting Started with Node on Heroku</a></li>
-            <li><a href="https://devcenter.heroku.com/articles/getting-started-with-php">Getting Started with PHP on Heroku</a></li>
-            <li><a href="https://devcenter.heroku.com/articles/getting-started-with-python">Getting Started with Python on Heroku</a></li>
-            <li><a href="https://devcenter.heroku.com/articles/getting-started-with-java">Getting Started with Java on Heroku</a></li>
-            <li><a href="https://devcenter.heroku.com/articles/getting-started-with-clojure">Getting Started with Clojure on Heroku</a></li>
-            <li><a href="https://devcenter.heroku.com/articles/getting-started-with-scala">Getting Started with Scala on Heroku</a></li>
-            <li class="divider"></li>
-            <li><a href="https://devcenter.heroku.com/articles/getting-started-with-heroku-and-connect-without-local-dev">Getting Started on Heroku with Heroku Connect</a></li>
-            <li><a href="https://devcenter.heroku.com/articles/getting-started-with-jruby">Getting Started with Ruby on Heroku (Microsoft Windows)</a></li>
-          </ul>
-      </li>
-    </ul>
-    <ul class="nav navbar-nav navbar-right">
-      <li class="navbar-right">
-        <a href="https://devcenter.heroku.com"><span class="glyphicon glyphicon-book"></span> Heroku Dev Center</a>
-      </li>
-    </ul>
-  </div>
-</nav>
 
-{% block content %}{% endblock %}
+<body data-spy="scroll" data-offset="60" data-target=".nav__holder" id="home" itemscope itemtype="http://schema.org/WebPage">
+
+	<!-- Preloader -->
+	<div class="loader-mask">
+		<div class="loader">
+			"Loading..."
+		</div>
+	</div>
+
+	<!-- Header -->
+	<header class="nav nav--always-fixed" itemtype="http://schema.org/WPHeader" itemscope>
+
+		<div class="nav__holder nav--sticky nav--align-center">
+			<div class="container-fluid container-semi-fluid">
+				<div class="flex-parent">
+
+					<div class="nav__header clearfix">
+						<!-- Logo -->
+						<div class="logo-wrap local-scroll">
+							<a href="#home" class="logo__url">
+								<img class="logo" src="{% static 'img/logo/logo.png' %}"
+									 srcset="{% static 'img/logo/logo.png' %} 1x, {% static 'img/logo/logo.png' %} 2x"
+									 alt="logo" itemtype="http://schema.org/Organization" itemscope>
+							</a>
+						</div>
+
+						<button type="button" class="nav__icon-toggle" id="nav__icon-toggle" data-toggle="collapse" data-target="#navbar-collapse">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="nav__icon-toggle-bar"></span>
+							<span class="nav__icon-toggle-bar"></span>
+							<span class="nav__icon-toggle-bar"></span>
+						</button>
+					</div> <!-- end nav-header -->
+
+					<!-- Navbar -->
+					<nav id="navbar-collapse" class="nav__wrap collapse navbar-collapse" itemtype="http://schema.org/SiteNavigationElement" itemscope="itemscope">
+						<ul class="nav__menu local-scroll" id="onepage-nav">
+							<li class="nav__dropdown">
+								<a href="index.html#home" class="nav-link active" aria-haspopup="true">Home</a>
+								<i class="ui-arrow-down nav__dropdown-trigger" role="button" aria-haspopup="true" aria-expanded="false"></i>
+								<ul class="nav__dropdown-menu">
+									<li>
+										<a href="index.html">
+											<span class="nav__dropdown-menu-label">Hero Image</span>
+										</a>
+									</li>
+									<li>
+										<a href="index-video-bg.html">
+											<span class="nav__dropdown-menu-label">HTML Video</span>
+										</a>
+									</li>
+									<li>
+										<a href="index-creative.html">
+											<span class="nav__dropdown-menu-label">Hero Creative</span>
+										</a>
+									</li>
+									<li>
+										<a href="index-youtube-bg.html">
+											<span class="nav__dropdown-menu-label">Youtube Video</span>
+										</a>
+									</li>
+									<li>
+										<a href="index-vimeo-bg.html">
+											<span class="nav__dropdown-menu-label">Vimeo Video</span>
+										</a>
+									</li>
+									<li>
+										<a href="index-projects-showcase.html">
+											<span class="nav__dropdown-menu-label">Projects Showcase</span>
+										</a>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<a href="#services" class="nav-link">Services</a>
+							</li>
+							<li>
+								<a href="#about" class="nav-link">About</a>
+							</li>
+							<li>
+								<a href="#works" class="nav-link">Works</a>
+							</li>
+							<li>
+								<a href="#blog" class="nav-link">Blog</a>
+							</li>
+							<li class="nav__dropdown">
+								<a href="#" class="nav-link" aria-haspopup="true">Pages</a>
+								<i class="ui-arrow-down nav__dropdown-trigger" role="button" aria-haspopup="true" aria-expanded="false"></i>
+								<ul class="nav__dropdown-menu">
+									<li>
+										<a href="projects.html">
+											<span class="nav__dropdown-menu-label">Projects</span>
+										</a>
+									</li>
+									<li>
+										<a href="single-project.html">
+											<span class="nav__dropdown-menu-label">Single Project</span>
+										</a>
+									</li>
+									<li>
+										<a href="blog.html">
+											<span class="nav__dropdown-menu-label">Blog</span>
+										</a>
+									</li>
+									<li>
+										<a href="single-post.html">
+											<span class="nav__dropdown-menu-label">Single Post</span>
+										</a>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<a href="#contact" class="nav-link">Contact</a>
+							</li>
+						</ul> <!-- end menu -->
+
+
+						<!-- Mobile Socials -->
+						<div class="nav__mobile-socials d-lg-none">
+							<div class="socials">
+								<a href="#" class="social social-behance" aria-label="behance" title="behance" target="_blank"><i class="ui-behance"></i></a>
+								<a href="#" class="social social-twitter" aria-label="twitter" title="twitter" target="_blank"><i class="ui-twitter"></i></a>
+								<a href="#" class="social social-linkedin" aria-label="linkedin" title="linkedin" target="_blank"><i class="ui-linkedin"></i></a>
+							</div>
+						</div>
+
+					</nav> <!-- end nav-wrap -->
+
+					<!-- Socials -->
+					<div class="nav__socials flex-child d-none d-lg-block">
+						<div class="socials right">
+							<a href="#" class="social social-behance" aria-label="behance" title="behance" target="_blank"><i class="ui-behance"></i></a>
+							<a href="#" class="social social-twitter" aria-label="twitter" title="twitter" target="_blank"><i class="ui-twitter"></i></a>
+							<a href="#" class="social social-linkedin" aria-label="linkedin" title="linkedin" target="_blank"><i class="ui-linkedin"></i></a>
+						</div>
+					</div>
+
+				</div> <!-- end flex-parent -->
+			</div> <!-- end container -->
+
+		</div>
+	</header> <!-- end navigation -->
+
+	<main class="main-wrap">
+		{% block content %}
+
+		{% endblock %}
+	</main> <!-- end main wrapper -->
+
+
+	<!-- jQuery Scripts -->
+	<script src="{% static 'js/jquery.min.js' %}"></script>
+	<script src="{% static 'js/scripts.min.js' %}"></script>
+
+	<!-- Revolution Slider Addons -->
+
+	<!-- DISTORTION ADD-ON FILES -->
+	<link rel='stylesheet' href="{% static 'revolution-addons/distortion/css/distortion.css' %}" type='text/css' media='all' />
+	<script type='text/javascript' src="{% static 'revolution-addons/distortion/js/pixi.min.js' %}"></script>
+	<script type='text/javascript' src="{% static 'revolution-addons/distortion/js/revolution.addon.distortion.min.js' %}"></script>
+
+
+	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.video.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.carousel.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.slideanims.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.actions.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.layeranimation.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.kenburn.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.navigation.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.migration.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.parallax.min.js' %}"></script>
+
 
 </body>
 </html>
