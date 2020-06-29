@@ -5,12 +5,12 @@
 {%block style%}
 .bg-pattern,
 .bg-pattern.angle:before {
-	background:url('{% static "img/dark_wall.png" %}');
+background:url('{% static "img/dark_wall.png" %}');
 }
 {%endblock %}
 
 {% block navStyle %}
-	nav__holder nav--sticky nav--align-center sticky offset scrolling
+nav__holder nav--sticky nav--align-center sticky offset scrolling
 {% endblock %}
 
 
@@ -21,9 +21,26 @@
         <div class="container">
             {% block body_content %}
             {% endblock body_content %}
+
+            {% if messages %}
+            <div class="row justify-content-center">
+                <div class="col-sm-6 col-sm-offset-3">
+                    <table align="center" border="0">
+                        {% for message in messages %}
+                        <tr>
+                            <td class="alert">
+                                {{ message }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </section> <!-- end from blog -->
 </div> <!-- end content wrap -->
+
 
 <!-- Footer -->
 <footer class="footer bg-dark bg-pattern" itemtype="http://schema.org/WPFooter" itemscope>

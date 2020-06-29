@@ -2,139 +2,171 @@
 
 <html lang="en">
 <head>
-	<title>Jueve | Creative Agency HTML Template</title>
+    <title>Jueve | Creative Agency HTML Template</title>
 
-	<meta charset="utf-8">
-	<!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<meta name="description" content="">
+    <meta charset="utf-8">
+    <!--[if IE]>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="">
 
-	<!-- Google Fonts -->
-	<link href='//fonts.googleapis.com/css?family=DM+Sans:400,400i,500,700' rel='stylesheet'>
+    <!-- Google Fonts -->
+    <link href='//fonts.googleapis.com/css?family=DM+Sans:400,400i,500,700' rel='stylesheet'>
 
-	<!-- Css -->
-	<link rel="stylesheet" href="{% static 'css/style.css' %}" />
-	<link rel="stylesheet" href="{% static 'css/custom.css' %}" />
+    <!-- Css -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}"/>
 
-	<!-- Favicons -->
-	<link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
-	<link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
-	<link rel="apple-touch-icon" sizes="72x72" href="{% static 'img/apple-touch-icon-72x72.png' %}">
-	<link rel="apple-touch-icon" sizes="114x114" href="{% static 'img/apple-touch-icon-114x114.png' %}">
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{% static 'img/apple-touch-icon-72x72.png' %}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{% static 'img/apple-touch-icon-114x114.png' %}">
 
-	<style>
+    <style>
 		{%block style%}
 		{%endblock %}
-	</style>
+
+
+    </style>
 </head>
 
 <body data-offset="60" data-target=".nav__holder" id="home" itemscope itemtype="http://schema.org/WebPage">
 
-	<!-- Preloader -->
-	<div class="loader-mask">
-		<div class="loader">
-			"Loading..."
-		</div>
-	</div>
+<!-- Preloader -->
+<div class="loader-mask">
+    <div class="loader">
+        "Loading..."
+    </div>
+</div>
 
-	<!-- Header -->
-	<header class="nav nav--always-fixed" itemtype="http://schema.org/WPHeader" itemscope>
+<!-- Header -->
+<header class="nav nav--always-fixed" itemtype="http://schema.org/WPHeader" itemscope>
 
-		<div class="{% block navStyle %}	{% endblock %}">
-			<div class="container-fluid container-semi-fluid">
-				<div class="flex-parent">
+    <div class="{% block navStyle %}	{% endblock %}">
+        <div class="container-fluid container-semi-fluid">
+            <div class="flex-parent">
 
-					<div class="nav__header clearfix">
-						<!-- Logo -->
-						<div class="logo-wrap local-scroll">
-							<a href="/" class="logo__url">
-								<img class="logo" src="{% static 'img/logo/logo.png' %}"
-									 srcset="{% static 'img/logo/logo.png' %} 1x, {% static 'img/logo/logo.png' %} 2x"
-									 alt="logo" itemtype="http://schema.org/Organization" itemscope>
-							</a>
-						</div>
+                <div class="nav__header clearfix">
+                    <!-- Logo -->
+                    <div class="logo-wrap local-scroll">
+                        <a href="/" class="logo__url">
+                            <img class="logo" src="{% static 'img/logo/logo.png' %}"
+                                 srcset="{% static 'img/logo/logo.png' %} 1x, {% static 'img/logo/logo.png' %} 2x"
+                                 alt="logo" itemtype="http://schema.org/Organization" itemscope>
+                        </a>
+                    </div>
 
-						<button type="button" class="nav__icon-toggle" id="nav__icon-toggle" data-toggle="collapse" data-target="#navbar-collapse">
-							<span class="sr-only">Toggle navigation</span>
-							<span class="nav__icon-toggle-bar"></span>
-							<span class="nav__icon-toggle-bar"></span>
-							<span class="nav__icon-toggle-bar"></span>
-						</button>
-					</div> <!-- end nav-header -->
+                    <button type="button" class="nav__icon-toggle" id="nav__icon-toggle" data-toggle="collapse"
+                            data-target="#navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="nav__icon-toggle-bar"></span>
+                        <span class="nav__icon-toggle-bar"></span>
+                        <span class="nav__icon-toggle-bar"></span>
+                    </button>
+                </div> <!-- end nav-header -->
 
-					<!-- Navbar -->
-					<nav id="navbar-collapse" class="nav__wrap collapse navbar-collapse" itemtype="http://schema.org/SiteNavigationElement" itemscope="itemscope">
-						<ul class="nav__menu local-scroll" id="onepage-nav">
-							<li>
-								<a href="/" class="nav-link active">Главная</a>
-							</li>
-							<li>
-								<a href="personal" class="nav-link">Мои статьи</a>
-							</li>
-							<li>
-								<a href="upload" class="nav-link">Проверить</a>
-							</li>
-							<li>
-								<a href="about" class="nav-link">О проекте</a>
-							</li>
-						</ul> <!-- end menu -->
-
-
-						<!-- Mobile Socials -->
-						<div class="nav__mobile-socials d-lg-none">
-							<div class="socials">
-								<a href="#" class="social social-behance" aria-label="behance" title="behance" target="_blank"><i class="ui-behance"></i></a>
-								<a href="#" class="social social-twitter" aria-label="twitter" title="twitter" target="_blank"><i class="ui-twitter"></i></a>
-								<a href="#" class="social social-linkedin" aria-label="linkedin" title="linkedin" target="_blank"><i class="ui-linkedin"></i></a>
-							</div>
-						</div>
-
-					</nav> <!-- end nav-wrap -->
-
-					<!-- Socials -->
-					<div class="nav__socials flex-child d-none d-lg-block">
-						<ul class="nav__menu local-scroll" id="onepage-nav2">
-							<li>
-								<a href="login" class="nav-link">Вход</a>
-							</li>
-						</ul>
-					</div>
-
-				</div> <!-- end flex-parent -->
-			</div> <!-- end container -->
-
-		</div>
-	</header> <!-- end navigation -->
-
-	<main class="main-wrap">
-		{% block content %}
-
-		{% endblock %}
-	</main> <!-- end main wrapper -->
+                <!-- Navbar -->
+                <nav id="navbar-collapse" class="nav__wrap collapse navbar-collapse"
+                     itemtype="http://schema.org/SiteNavigationElement" itemscope="itemscope">
+                    <ul class="nav__menu local-scroll" id="onepage-nav">
+                        <li>
+                            <a href="/" class="nav-link active">Главная</a>
+                        </li>
+                        <li>
+                            <a href="personal" class="nav-link">Мои статьи</a>
+                        </li>
+                        <li>
+                            <a href="upload" class="nav-link">Проверить</a>
+                        </li>
+                        <li>
+                            <a href="about" class="nav-link">О проекте</a>
+                        </li>
+                    </ul> <!-- end menu -->
 
 
-	<!-- jQuery Scripts -->
-	<script src="{% static 'js/jquery.min.js' %}"></script>
-	<script src="{% static 'js/scripts.min.js' %}"></script>
+                    <!-- Mobile Socials -->
+                    <div class="nav__mobile-socials d-lg-none">
+                        <div class="socials">
+                            <a href="#" class="social social-behance" aria-label="behance" title="behance"
+                               target="_blank"><i class="ui-behance"></i></a>
+                            <a href="#" class="social social-twitter" aria-label="twitter" title="twitter"
+                               target="_blank"><i class="ui-twitter"></i></a>
+                            <a href="#" class="social social-linkedin" aria-label="linkedin" title="linkedin"
+                               target="_blank"><i class="ui-linkedin"></i></a>
+                        </div>
+                    </div>
 
-	<!-- Revolution Slider Addons -->
+                </nav> <!-- end nav-wrap -->
 
-	<!-- DISTORTION ADD-ON FILES -->
-	<link rel='stylesheet' href="{% static 'revolution-addons/distortion/css/distortion.css' %}" type='text/css' media='all' />
-	<script type='text/javascript' src="{% static 'revolution-addons/distortion/js/pixi.min.js' %}"></script>
-	<script type='text/javascript' src="{% static 'revolution-addons/distortion/js/revolution.addon.distortion.min.js' %}"></script>
+                <!-- Socials -->
+                <div class="nav__socials flex-child d-none d-lg-block">
+                    <ul class="nav__menu local-scroll" id="onepage-nav2">
+                        <li class="nav__dropdown">
+                            <a href="login" class="nav-link">
+                                {% if user.is_authenticated %}
+                                <a href="" class="nav-link" aria-haspopup="true">{{user.username}}</a>
+                                <i class="ui-arrow-down nav__dropdown-trigger" role="button" aria-haspopup="true"
+                                   aria-expanded="false"></i>
+                                <ul class="nav__dropdown-menu">
+                                    <li>
+                                        <a href="logout">
+                                            <span class="nav__dropdown-menu-label">Выход</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                {% else %}
+                                Вход
+                                {% endif %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div> <!-- end flex-parent -->
+        </div> <!-- end container -->
+
+    </div>
+</header> <!-- end navigation -->
+
+<main class="main-wrap">
+    {% block content %}
+
+    {% endblock %}
+</main> <!-- end main wrapper -->
 
 
-	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.video.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.carousel.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.slideanims.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.actions.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.layeranimation.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.kenburn.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.navigation.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.migration.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.parallax.min.js' %}"></script>
+<!-- jQuery Scripts -->
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/scripts.min.js' %}"></script>
 
+<!-- Revolution Slider Addons -->
+
+<!-- DISTORTION ADD-ON FILES -->
+<link rel='stylesheet' href="{% static 'revolution-addons/distortion/css/distortion.css' %}" type='text/css'
+      media='all'/>
+<script type='text/javascript' src="{% static 'revolution-addons/distortion/js/pixi.min.js' %}"></script>
+<script type='text/javascript'
+        src="{% static 'revolution-addons/distortion/js/revolution.addon.distortion.min.js' %}"></script>
+
+
+<script type="text/javascript" src="{% static 'revolution/js/extensions/revolution.extension.video.min.js' %}"></script>
+<script type="text/javascript"
+        src="{% static 'revolution/js/extensions/revolution.extension.carousel.min.js' %}"></script>
+<script type="text/javascript"
+        src="{% static 'revolution/js/extensions/revolution.extension.slideanims.min.js' %}"></script>
+<script type="text/javascript"
+        src="{% static 'revolution/js/extensions/revolution.extension.actions.min.js' %}"></script>
+<script type="text/javascript"
+        src="{% static 'revolution/js/extensions/revolution.extension.layeranimation.min.js' %}"></script>
+<script type="text/javascript"
+        src="{% static 'revolution/js/extensions/revolution.extension.kenburn.min.js' %}"></script>
+<script type="text/javascript"
+        src="{% static 'revolution/js/extensions/revolution.extension.navigation.min.js' %}"></script>
+<script type="text/javascript"
+        src="{% static 'revolution/js/extensions/revolution.extension.migration.min.js' %}"></script>
+<script type="text/javascript"
+        src="{% static 'revolution/js/extensions/revolution.extension.parallax.min.js' %}"></script>
 
 </body>
 </html>

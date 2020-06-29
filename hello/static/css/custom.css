@@ -1,1 +1,13 @@
 /*! Paste your custom styles here */
+
+.alert{
+    height: 48px;
+    border-radius: 0;
+    border: 1px solid transparent;
+    background-color: #F8F8F8;
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 0 12px;
+    -webkit-transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+    transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}

@@ -5,6 +5,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 import hello.views
+import hello.auth
 
 # To add a new path, first import the app:
 # import blog
@@ -18,8 +19,9 @@ urlpatterns = [
     path("", hello.views.index, name="index"),
     path("test", hello.views.test, name="test"),
     path("upload", hello.views.upload, name="upload"),
-    path("login", hello.views.login, name="login"),
-    path("register", hello.views.register, name="register"),
+    path("login", hello.auth.login, name="login"),
+    path("logout", hello.auth.logout_view, name="logout_view"),
+    path("register", hello.auth.register, name="register"),
     path("about", hello.views.about, name="about"),
     path("personal", hello.views.personal, name="personal"),
     path("db/", hello.views.db, name="db"),
