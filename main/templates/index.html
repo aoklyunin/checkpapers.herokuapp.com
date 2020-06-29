@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 
+{%block title%}
+    CheckPapers
+{%endblock %}
+
 {% block navStyle %}
     nav__holder nav--sticky nav--align-center
 {% endblock %}
@@ -9,6 +13,7 @@
  <!-- Css -->
 <link rel="stylesheet" href="{% static 'css/index.css' %}"/>
 {% endblock %}
+
 
 
 {% block content %}
