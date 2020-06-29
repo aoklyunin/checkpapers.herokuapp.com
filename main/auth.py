@@ -27,8 +27,7 @@ def register(request):
                         }
                 # перерисовываем окно
                 return render(request, "register.html", {
-                    'form': RegisterForm(initial=data),
-                    'ins_form': LoginForm()
+                    'form': RegisterForm(initial=data)
                 })
             else:
                 # получаем данные из формы
@@ -54,12 +53,11 @@ def register(request):
                             }
                     # рисуем окно регистрации
                     return render(request, "register.html", {
-                        'form': RegisterForm(initial=data),
-                        'ins_form': LoginForm()
+                        'form': RegisterForm(initial=data)
                     })
         else:
             # перезагружаем страницу
-            messages.error(request, "форма не правильная")
+            messages.error(request, "Неправильно заполнена форма")
             return HttpResponseRedirect("register")
     else:
         # возвращаем простое окно регистрации

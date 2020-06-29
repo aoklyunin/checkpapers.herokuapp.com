@@ -32,3 +32,9 @@ class RegisterForm(forms.Form):
     # почта
     mail = forms.CharField(widget=forms.Textarea(attrs={'rows': 1, 'cols': 20, 'placeholder': 'example@gmail.com'}),
                            label="Адрес электронной почты")
+
+
+class PaperForm(forms.Form):
+    text = forms.CharField(widget=forms.Textarea(
+        attrs={'rows': 25, 'cols': 100, 'placeholder': 'текст, который нужно проверить на уникальность'}),
+                          label="Текст статьи")

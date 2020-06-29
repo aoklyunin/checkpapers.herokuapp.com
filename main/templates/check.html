@@ -1,5 +1,9 @@
 {% extends "nonMainBase.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Проверить статью{% endblock %}
+
 {% block nav %}
 <li>
     <a href="/" class="nav-link">Главная</a>
@@ -8,7 +12,7 @@
     <a href="personal" class="nav-link">Мои статьи</a>
 </li>
 <li>
-    <a href="upload" class="nav-link active">Проверить</a>
+    <a href="check" class="nav-link active">Проверить</a>
 </li>
 <li>
     <a href="about" class="nav-link">О проекте</a>
@@ -16,128 +20,17 @@
 {% endblock %}
 
 {% block body_content %}
-
-
-<div class="row justify-content-center">
-    <div class="col-lg-6">
-        <div class="title-row text-center">
-            <h2 class="section-title">Latest Thoughts</h2>
-            <p class="section-description">Design is so simple and relevant works.
-                why it's so complicated.</p>
-        </div>
+<div class="row justify-content-center check-row">
+    <div class="col-lg-8">
+        <form role="form" action="" method="post" align="center">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.text|as_crispy_field }}
+            </div>
+            <button type="submit" class="btn btn-success">Проверить</button>
+        </form>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-lg-4">
-        <H1> Upload </H1>
-        <div class="animate">
-            <div class="animate-container">
-                <article class="entry" itemscope itemtype="http://schema.org/Article">
-                    <div class="entry__header hover-shrink">
-                        <a href="single-post.html" class="entry__img-url hover-shrink--shrink">
-                            <img src="{% static 'img/blog/blog_preview_1.jpg' %}"
-                                 class="entry__img hover-shrink--zoom" itemprop="image" alt="">
-                        </a>
-                    </div>
-                    <div class="entry__body">
-                        <div class="entry__meta">
-                                        <span class="entry__meta-item entry__meta-date" itemprop="datePublished"
-                                              content="2019-11-13">11/13/2019</span>
-                            <span class="entry__meta-item entry__meta-category">
-													<span>in </span>
-													<a href="#" class="entry__meta-category-url">Business</a>
-												</span>
-                        </div>
-                        <h4 class="entry__title title-underline">
-                            <a href="single-post.html" itemprop="headline">Business Mistakes to Avoid When
-                                Starting a Business</a>
-                        </h4>
-                        <div class="entry__meta">
-												<span class="entry__meta-item entry__meta-author">
-													<span>by</span>
-													<a href="#" class="entry__meta-author-url">
-														<span class="entry__meta-author-name" itemprop="author">Camille Alforque</span>
-													</a>
-												</span>
-                        </div>
-                    </div>
-                </article>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="animate">
-            <div class="animate-container">
-                <article class="entry" itemscope itemtype="http://schema.org/Article">
-                    <div class="entry__header hover-shrink">
-                        <a href="single-post.html" class="entry__img-url hover-shrink--shrink">
-                            <img src="{% static 'img/blog/blog_preview_2.jpg' %}"
-                                 class="entry__img hover-shrink--zoom" itemprop="image" alt="">
-                        </a>
-                    </div>
-                    <div class="entry__body">
-                        <div class="entry__meta">
-                                        <span class="entry__meta-item entry__meta-date" itemprop="datePublished"
-                                              content="2019-11-13">11/13/2019</span>
-                            <span class="entry__meta-item entry__meta-category">
-													<span>in </span>
-													<a href="#" class="entry__meta-category-url">Innovation</a>
-												</span>
-                        </div>
-                        <h4 class="entry__title title-underline">
-                            <a href="single-post.html" itemprop="headline">The Hyper Flexible Seamlessly
-                                Connected Modern Working</a>
-                        </h4>
-                        <div class="entry__meta">
-												<span class="entry__meta-item entry__meta-author">
-													<span>by</span>
-													<a href="#" class="entry__meta-author-url">
-														<span class="entry__meta-author-name" itemprop="author">Camille Alforque</span>
-													</a>
-												</span>
-                        </div>
-                    </div>
-                </article>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="animate">
-            <div class="animate-container">
-                <article class="entry" itemscope itemtype="http://schema.org/Article">
-                    <div class="entry__header hover-shrink">
-                        <a href="single-post.html" class="entry__img-url hover-shrink--shrink">
-                            <img src="{% static 'img/blog/blog_preview_3.jpg' %}"
-                                 class="entry__img hover-shrink--zoom" itemprop="image" alt="">
-                        </a>
-                    </div>
-                    <div class="entry__body">
-                        <div class="entry__meta">
-                                        <span class="entry__meta-item entry__meta-date" itemprop="datePublished"
-                                              content="2019-11-13">11/13/2019</span>
-                            <span class="entry__meta-item entry__meta-category">
-													<span>in </span>
-													<a href="#" class="entry__meta-category-url">Productivity</a>
-												</span>
-                        </div>
-                        <h4 class="entry__title title-underline">
-                            <a href="single-post.html" itemprop="headline">Are you a design
-                                superstar-in-the-making?</a>
-                        </h4>
-                        <div class="entry__meta">
-												<span class="entry__meta-item entry__meta-author">
-													<span>by</span>
-													<a href="#" class="entry__meta-author-url">
-														<span class="entry__meta-author-name" itemprop="author">Camille Alforque</span>
-													</a>
-												</span>
-                        </div>
-                    </div>
-                </article>
-            </div>
-        </div>
-    </div>
-</div>
 
-{% endblock body_content %}
+{% endblock %}
