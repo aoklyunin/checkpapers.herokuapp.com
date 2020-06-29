@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as dj_login
 
-from hello.forms import RegisterForm, LoginForm
+from main.forms import RegisterForm, LoginForm
 
 
 # метод регистрации

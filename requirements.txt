@@ -1,4 +1,5 @@
-Django==1.10.3
-gunicorn==19.4.5
+Django
+gunicorn
 django-heroku
+django-postgres-unlimited-varchar
 django-crispy-forms

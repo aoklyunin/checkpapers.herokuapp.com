@@ -2604,7 +2604,7 @@ header .flex-child.flex-right {
 -------------------------------------------------------*/
 .nav--pattern,
 .nav--pattern .nav__holder {
-	background: url("{{ STATIC_URL }} ../img/dark_wall.png"); }
+	background: url("../img/dark_wall.png"); }
 
 /* Go to Top
 -------------------------------------------------------*/
@@ -3903,8 +3903,8 @@ website:   	http://www.themepunch.com
 
 @font-face {
 	font-family: revicons;
-	src: url({{ STATIC_URL }}../fonts/revicons/revicons.eot?5510888);
-	src: url({{ STATIC_URL }}../fonts/revicons/revicons.eot?5510888#iefix) format("embedded-opentype"), url({{ STATIC_URL }}../fonts/revicons/revicons.woff?5510888) format("woff"), url({{ STATIC_URL }}../fonts/revicons/revicons.ttf?5510888) format("truetype"), url({{ STATIC_URL }}../fonts/revicons/revicons.svg?5510888#revicons) format("svg");
+	src: url(../fonts/revicons/revicons.eot?5510888);
+	src: url(../fonts/revicons/revicons.eot?5510888#iefix) format("embedded-opentype"), url(../fonts/revicons/revicons.woff?5510888) format("woff"), url(../fonts/revicons/revicons.ttf?5510888) format("truetype"), url(../fonts/revicons/revicons.svg?5510888#revicons) format("svg");
 	font-weight: 400;
 	font-style: normal; }
 
@@ -4145,11 +4145,6 @@ website:   	http://www.themepunch.com
 	height: 100%;
 	position: relative; }
 
-.tp-carousel-wrapper {
-	cursor: url({{ STATIC_URL }}openhand.cur), move; }
-
-.tp-carousel-wrapper.dragged {
-	cursor: url({{ STATIC_URL }}closedhand.cur), move; }
 
 .tp_inner_padding {
 	box-sizing: border-box;
@@ -4500,18 +4495,6 @@ img.tp-slider-alternative-image {
 	background-repeat: repeat;
 	width: 100%;
 	z-index: 3; }
-
-.tp-dottedoverlay.twoxtwo {
-	background: url({{ STATIC_URL }}../assets/gridtile.png); }
-
-.tp-dottedoverlay.twoxtwowhite {
-	background: url({{ STATIC_URL }}../assets/gridtile_white.png); }
-
-.tp-dottedoverlay.threexthree {
-	background: url({{ STATIC_URL }}../assets/gridtile_3x3.png); }
-
-.tp-dottedoverlay.threexthreewhite {
-	background: url({{ STATIC_URL }}../assets/gridtile_3x3_white.png); }
 
 .tp-shadowcover {
 	width: 100%;
@@ -4877,18 +4860,6 @@ img.tp-slider-alternative-image {
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#00FFFFFF,endColorstr=#00FFFFFF)";
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#00FFFFFF, endColorstr=#00FFFFFF);
 	zoom: 1; }
-
-.caption.slidelink a div, .tp-caption.slidelink a div {
-	width: 3000px;
-	height: 1500px;
-	background: url({{ STATIC_URL }}../assets/coloredbg.png); }
-
-.tp-caption.slidelink a span {
-	background: url({{ STATIC_URL }}../assets/coloredbg.png); }
-
-.tp-loader.spinner0, .tp-loader.spinner5 {
-	background-image: url({{ STATIC_URL }}../assets/loader.gif);
-	background-repeat: no-repeat; }
 
 .tp-shape {
 	width: 100%;
