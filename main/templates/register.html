@@ -9,19 +9,38 @@ margin: 0 auto;
 }
 {% endblock %}
 
+{% block nav %}
+<li>
+    <a href="/" class="nav-link">Главная</a>
+</li>
+<li>
+    <a href="personal" class="nav-link">Мои статьи</a>
+</li>
+<li>
+    <a href="upload" class="nav-link">Проверить</a>
+</li>
+<li>
+    <a href="about" class="nav-link">О проекте</a>
+</li>
+{% endblock %}
+
 {% block body_content %}
-<form method="post" action="" class="register_form">
-    {% csrf_token %}
-    <br><br>
+<div class="row justify-content-center register-row">
+    <div class="col-lg-3">
+        <form method="post" action="" class="register_form">
+            {% csrf_token %}
+            <br><br>
 
-    {{form.username|as_crispy_field }}
-    {{form.password|as_crispy_field }}
-    {{form.rep_password|as_crispy_field }}
+            {{form.username|as_crispy_field }}
+            {{form.password|as_crispy_field }}
+            {{form.rep_password|as_crispy_field }}
 
-    {{form.mail|as_crispy_field }}
+            {{form.mail|as_crispy_field }}
 
-    <div align="center">
-           <button type="submit" class="btn btn-success">Регистрация</button>
+            <div align="center">
+                <button type="submit" class="btn btn-success">Регистрация</button>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 {% endblock %}

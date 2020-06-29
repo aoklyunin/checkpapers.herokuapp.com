@@ -18,7 +18,7 @@ import main.auth
 urlpatterns = [
     path("", main.views.index, name="index"),
     path("test", main.views.test, name="test"),
-    path("upload", main.views.upload, name="upload"),
+    path("upload", main.views.check, name="upload"),
     path("login", main.auth.login, name="login"),
     path("logout", main.auth.logout_view, name="logout_view"),
     path("register", main.auth.register, name="register"),

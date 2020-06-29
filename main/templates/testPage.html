@@ -1,5 +1,20 @@
 {% extends "nonMainBase.html" %}
 {% load static %}
+{% block nav %}
+                        <li>
+                            <a href="/" class="nav-link">Главная</a>
+                        </li>
+                        <li>
+                            <a href="personal" class="nav-link">Мои статьи</a>
+                        </li>
+                        <li>
+                            <a href="upload" class="nav-link">Проверить</a>
+                        </li>
+                        <li>
+                            <a href="about" class="nav-link">О проекте</a>
+                        </li>
+                        {% endblock %}
+
 {% block body_content %}
 <div class="row justify-content-center">
     <div class="col-lg-6">

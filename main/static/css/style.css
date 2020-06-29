@@ -5652,14 +5652,15 @@ iframe {
 	.about__holder {
 		display: -webkit-box;
 		display: flex;
-		flex-wrap: nowrap; }
+		flex-wrap: nowrap;
+		padding: 60px 20px 60px 40px; }
 	.about__info {
 		margin-left: 40px;
 		margin-top: 0; } }
 
 @media only screen and (min-width: 992px) {
 	.about__holder {
-		padding: 60px 20px 40px 40px; }
+		padding: 60px 20px 120px 40px; }
 	.about__info {
 		max-width: 600px; } }
 
@@ -5669,7 +5670,7 @@ iframe {
 		        align-items: center;
 		max-width: 65%;
 		margin-left: auto;
-		padding: 200px 20px 160px 280px;
+		padding: 200px 20px 230px 280px;
 		}
 	.about__img-holder {
 		position: absolute;
@@ -5677,7 +5678,7 @@ iframe {
 
 @media (min-width: 1600px) {
 	.about__holder {
-		padding: 200px 20px 360px 360px; }
+		padding: 200px 20px 230px 360px; }
 	.about__img-holder {
 		left: -400px; } }
 

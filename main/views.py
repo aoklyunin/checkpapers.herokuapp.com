@@ -21,50 +21,9 @@ def test(request):
 
 
 # Create your views here.
-def upload(request):
+def check(request):
     # return HttpResponse('Hello from Python!')
-    return render(request, "upload.html")
-
-
-def register(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-        username = form.cleaned_data.get('username')
-        my_password = form.cleaned_data.get('password1')
-        user = authenticate(username=username, password=my_password)
-        auth_login(request, user)
-        return redirect('personal')
-    else:
-        form = UserCreationForm()
-        return render(request, 'register.html', {'form': form})
-
-
-# Create your views here.
-def login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = auth.authenticate(username=username, password=password)
-        if user is not None and user.is_active:
-            # Правильный пароль и пользователь "активен"
-            auth.login(request, user)
-            # Перенаправление на "правильную" страницу
-            return redirect('personal')
-        else:
-            # Отображение страницы с ошибкой
-            return redirect('personal')
-
-    else:
-        # return HttpResponse('Hello from Python!')
-        return render(request, "login.html")
-
-
-def logout(request):
-    auth.logout(request)
-    # Перенаправление на страницу.
-    return HttpResponseRedirect("/account/loggedout/")
+    return render(request, "check.html")
 
 
 # Create your views here.

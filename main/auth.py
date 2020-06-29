@@ -47,7 +47,7 @@ def register(request):
 
                 except:
                     # если не получилось создать пользователя, то выводим сообщение
-                    messages.error(request, "Такой пользователь уже есть")
+                    messages.error(request, "Пользователь "+musername+" уже зарегистрирован")
                     # заполняем дату формы
                     data = {'username': form.cleaned_data["username"],
                             'mail': form.cleaned_data["mail"],
@@ -93,7 +93,6 @@ def login(request):
                 # входим на сайт
                 auth.login(request, user)
                 # выводим сообщение об удаче
-                messages.success(request, "успешный вход")
                 return HttpResponseRedirect("personal")
             else:
                 messages.error(request, "пара логин-пароль не найдена")

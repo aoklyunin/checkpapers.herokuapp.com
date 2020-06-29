@@ -74,18 +74,8 @@
                 <nav id="navbar-collapse" class="nav__wrap collapse navbar-collapse"
                      itemtype="http://schema.org/SiteNavigationElement" itemscope="itemscope">
                     <ul class="nav__menu local-scroll" id="onepage-nav">
-                        <li>
-                            <a href="/" class="nav-link active">Главная</a>
-                        </li>
-                        <li>
-                            <a href="personal" class="nav-link">Мои статьи</a>
-                        </li>
-                        <li>
-                            <a href="upload" class="nav-link">Проверить</a>
-                        </li>
-                        <li>
-                            <a href="about" class="nav-link">О проекте</a>
-                        </li>
+                        {% block nav %}
+                        {% endblock %}
                     </ul> <!-- end menu -->
 
 

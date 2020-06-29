@@ -15,3 +15,65 @@
 a.nav-link:hover {
 color: #FE5900;
 }
+
+.login-row {
+	background-color: #fff;
+	padding: 40px 40px;
+	position: relative; }
+
+
+@media only screen and (min-width: 576px) {
+	.login-row  {
+		display: -webkit-box;
+		display: flex;
+		flex-wrap: nowrap; }
+}
+
+@media only screen and (min-width: 992px) {
+	.login-row {
+		padding: 190px 20px 280px 40px; }
+ }
+
+@media (min-width: 1280px) {
+    .login-row {
+		-webkit-box-align: center;
+		        align-items: center;
+		margin-left: auto;
+		padding: 120px 0px 350px 0px;
+		} }
+
+@media (min-width: 1600px) {
+	.login-row {
+		padding: 160px 0px 320px 0px; }
+}
+
+.register-row {
+	background-color: #fff;
+	padding: 40px 40px;
+	position: relative; }
+
+
+@media only screen and (min-width: 576px) {
+	.register-row  {
+		display: -webkit-box;
+		display: flex;
+		flex-wrap: nowrap; }
+}
+
+@media only screen and (min-width: 992px) {
+	.register-row {
+		padding: 60px 20px 150px 40px; }
+ }
+
+@media (min-width: 1280px) {
+    .register-row {
+		-webkit-box-align: center;
+		        align-items: center;
+		margin-left: auto;
+		padding: 100px 0px 140px 0px;
+		} }
+
+@media (min-width: 1600px) {
+	.register-row {
+		padding: 60px 0px 180px 0px; }
+}

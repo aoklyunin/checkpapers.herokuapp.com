@@ -15,8 +15,22 @@
 {% endblock %}
 
 
-
+{% block nav %}
+                        <li>
+                            <a href="/" class="nav-link active">Главная</a>
+                        </li>
+                        <li>
+                            <a href="personal" class="nav-link">Мои статьи</a>
+                        </li>
+                        <li>
+                            <a href="upload" class="nav-link">Проверить</a>
+                        </li>
+                        <li>
+                            <a href="about" class="nav-link">О проекте</a>
+                        </li>
+                        {% endblock %}
 {% block content %}
+
 <div class="content-wrap">
     <!-- Revolution Slider -->
     <section class="p-0">

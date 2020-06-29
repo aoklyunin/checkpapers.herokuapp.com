@@ -20,10 +20,7 @@ nav__holder nav--sticky nav--align-center sticky offset scrolling
     <!-- From Blog -->
     <section class="section-from-blog pb-96 angle angle--top" id="blog">
         <div class="container">
-            {% block body_content %}
-            {% endblock body_content %}
-
-            {% if messages %}
+             {% if messages %}
             <div class="row justify-content-center">
                 <div class="col-sm-6 col-sm-offset-3">
                     <table align="center" border="0">
@@ -38,6 +35,11 @@ nav__holder nav--sticky nav--align-center sticky offset scrolling
                 </div>
             </div>
             {% endif %}
+
+            {% block body_content %}
+            {% endblock body_content %}
+
+
         </div>
     </section> <!-- end from blog -->
 </div> <!-- end content wrap -->
@@ -51,41 +53,22 @@ nav__holder nav--sticky nav--align-center sticky offset scrolling
 
                 <div class="col-lg-4 col-md-6">
                     <div class="widget widget-about-us">
-                        <span class="widget-about-us__text">We’d love to hear from you</span>
-                        <a href="mailto:hello@jueveagency.com" class="widget-about-us__email">hello@jueveagency.com</a>
-                        <a href="tel:021-5395-6573" class="widget-about-us__phone">021 5395 6573</a>
-                        <div class="socials mt-32">
-                            <a href="#" class="social social-behance" aria-label="behance" title="behance"
-                               target="_blank"><i class="ui-behance"></i></a>
-                            <a href="#" class="social social-twitter" aria-label="twitter" title="twitter"
-                               target="_blank"><i class="ui-twitter"></i></a>
-                            <a href="#" class="social social-google-plus" aria-label="linkedin" title="linkedin"
-                               target="_blank"><i class="ui-linkedin"></i></a>
-                            <a href="#" class="social social-facebook" aria-label="facebook" title="facebook"
-                               target="_blank"><i class="ui-facebook"></i></a>
-                        </div>
+                        <span class="widget-about-us__text">Контакты</span>
+                        <a href="mailto:hello@jueveagency.com" class="widget-about-us__email">aoklyunin@gmail.com</a>
+                        <a href="tel:021-5395-6573" class="widget-about-us__phone">+7 921 583 28 98</a>
                     </div>
                 </div> <!-- end about us -->
 
 
                 <div class="col-lg-4 col-md-6">
-                    <div class="widget text-center text-md-left">
-                        <h3 class="widget-cta__title white mb-32">Got a project in mind?</h3>
-                        <a href="#" class="btn btn--lg btn--stroke contact-form-trigger" data-toggle="modal"
-                           data-target="#contact-form-modal">
-                            <span>Start a Project</span>
-                        </a>
-                    </div>
+
                 </div>
 
                 <div class="col-lg-4 col-md-6">
                     <div class="widget widget-address">
-                        <address class="widget-address__address">Studio 8E, Stamford<br>
-                            WorksGillett Square, Dalston<br>
-                            London, N16 8JH
-                        </address>
-                        <a href="https://www.google.bg/maps/place/1702+Olympic+Blvd,+Santa+Monica,+CA+90404,+USA/data=!4m2!3m1!1s0x80c2bb3056a299ef:0x94f425adda595d69?sa=X&ved=0ahUKEwje-u2zobfPAhXFthQKHXdEBY4Q8gEIGTAA"
-                           class="widget-address__url" target="_self">Get Directions</a>
+                        <address class="widget-address__address">Санкт-Петербург</address>
+                        <a href="https://goo.gl/maps/RKPrRHF2vBNpU6HV8"
+                           class="widget-address__url" target="_self">На карте</a>
                     </div>
                 </div>
 
