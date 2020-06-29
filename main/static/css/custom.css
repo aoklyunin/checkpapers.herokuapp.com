@@ -77,3 +77,33 @@ color: #FE5900;
 	.register-row {
 		padding: 60px 0px 180px 0px; }
 }
+.need-autherification {
+	background-color: #fff;
+	padding: 220px 40px;
+	position: relative; }
+
+
+@media only screen and (min-width: 576px) {
+	.need-autherification  {
+		display: -webkit-box;
+		display: flex;
+		flex-wrap: nowrap; }
+}
+
+@media only screen and (min-width: 992px) {
+	.need-autherification {
+		padding: 260px 20px 230px 40px; }
+ }
+
+@media (min-width: 1280px) {
+    .need-autherification {
+		-webkit-box-align: center;
+		        align-items: center;
+		margin-left: auto;
+		padding: 260px 0px 230px 0px;
+		} }
+
+@media (min-width: 1600px) {
+	.need-autherification {
+		padding: 260px 0px 230px 0px; }
+}
