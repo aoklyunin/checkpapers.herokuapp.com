@@ -4,8 +4,8 @@ from django.contrib import admin
 
 admin.autodiscover()
 
-import hello.views
-import hello.auth
+import main.views
+import main.auth
 
 # To add a new path, first import the app:
 # import blog
@@ -16,14 +16,14 @@ import hello.auth
 # Learn more here: https://docs.djangoproject.com/en/2.1/topics/http/urls/
 
 urlpatterns = [
-    path("", hello.views.index, name="index"),
-    path("test", hello.views.test, name="test"),
-    path("upload", hello.views.upload, name="upload"),
-    path("login", hello.auth.login, name="login"),
-    path("logout", hello.auth.logout_view, name="logout_view"),
-    path("register", hello.auth.register, name="register"),
-    path("about", hello.views.about, name="about"),
-    path("personal", hello.views.personal, name="personal"),
-    path("db/", hello.views.db, name="db"),
+    path("", main.views.index, name="index"),
+    path("test", main.views.test, name="test"),
+    path("upload", main.views.upload, name="upload"),
+    path("login", main.auth.login, name="login"),
+    path("logout", main.auth.logout_view, name="logout_view"),
+    path("register", main.auth.register, name="register"),
+    path("about", main.views.about, name="about"),
+    path("personal", main.views.personal, name="personal"),
+    path("db/", main.views.db, name="db"),
     path("admin/", admin.site.urls),
 ]
