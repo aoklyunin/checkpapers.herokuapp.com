@@ -5637,8 +5637,8 @@ iframe {
 /* About
 /*-------------------------------------------------------*/
 .about__holder {
-	padding: 60px 40px;
 	background-color: #fff;
+	padding: 40px 40px;
 	position: relative; }
 
 .about__img-holder {
@@ -5659,7 +5659,7 @@ iframe {
 
 @media only screen and (min-width: 992px) {
 	.about__holder {
-		padding: 80px 40px; }
+		padding: 60px 20px 40px 40px; }
 	.about__info {
 		max-width: 600px; } }
 
@@ -5669,14 +5669,15 @@ iframe {
 		        align-items: center;
 		max-width: 65%;
 		margin-left: auto;
-		padding: 160px 20px 160px 280px; }
+		padding: 200px 20px 160px 280px;
+		}
 	.about__img-holder {
 		position: absolute;
 		left: -400px; } }
 
 @media (min-width: 1600px) {
 	.about__holder {
-		padding: 160px 20px 160px 360px; }
+		padding: 200px 20px 360px 360px; }
 	.about__img-holder {
 		left: -400px; } }
 
