@@ -24,6 +24,6 @@ urlpatterns = [
     path("register", main.auth.register, name="register"),
     path("about", main.views.about, name="about"),
     path("personal", main.views.personal, name="personal"),
-    path("db/", main.views.db, name="db"),
+    path("deletepaper/<int:paper_id>/", main.views.deletePaper, name="deletepaper"),
     path("admin/", admin.site.urls),
 ]

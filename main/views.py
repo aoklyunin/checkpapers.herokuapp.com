@@ -45,7 +45,7 @@ def check(request):
                     text=form.cleaned_data["text"],
                     uniquenessPercent=u
                 )
-            messages.info(request, "Уникальность текста: "+f"{u:.{1}f}%".format(u))
+            messages.info(request, "Уникальность текста: " + f"{u:.{1}f}%".format(u))
             # перерисовываем окно
             return render(request, "check.html", {
                 'form': PaperForm(initial=data),
@@ -71,13 +71,33 @@ def about(request):
 # Create your views here.
 def personal(request):
     # return HttpResponse('Hello from Python!')
-    return render(request, "personal.html")
+    if request.user.is_authenticated:
+        papers = Paper.objects.all().filter(author=request.user)
+        return render(request, "personal.html", {
+            "papers": papers,
+            "paperCount": len(papers)
+        })
+    else:
+        return render(request, "personal.html", {
+            "papers": [],
+            "paperCount": 0
+        })
 
 
-def db(request):
-    greeting = Greeting()
-    greeting.save()
+def deletePaper(request, paper_id):
+    # return HttpResponse('Hello from Python!')
+    if not request.user.is_authenticated:
+        messages.error(request, "статьи может удалять только авторизованный пользователь")
+        return HttpResponseRedirect("/login")
 
-    greetings = Greeting.objects.all()
+    try:
+        paper = Paper.objects.get(pk=paper_id)
+        if not request.user == paper.author:
+            messages.error(request, "Вы не можете удалять чужые статьи")
+        else:
+            paper.delete()
+    except:
+        messages.error(request, "статья с id "+str(paper_id)+" не найдена")
 
-    return render(request, "db.html", {"greetings": greetings})
+    return HttpResponseRedirect("/personal")
+

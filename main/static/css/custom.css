@@ -107,3 +107,38 @@ color: #FE5900;
 	.need-autherification {
 		padding: 260px 0px 230px 0px; }
 }
+
+.papers-row {
+	background-color: #fff;
+	padding: 0px 40px;
+	position: relative; }
+
+
+@media only screen and (min-width: 576px) {
+	.papers-row  {
+		display: -webkit-box;
+		display: flex;
+		flex-wrap: nowrap; }
+}
+
+@media only screen and (min-width: 992px) {
+	.papers-row {
+		padding: 0px 20px 490px 40px; }
+ }
+
+@media (min-width: 1280px) {
+    .papers-row {
+		-webkit-box-align: center;
+		        align-items: center;
+		margin-left: auto;
+		padding: 0px 0px 490px 0px;
+		} }
+
+@media (min-width: 1600px) {
+	.papers-row {
+		padding: 0px 0px 490px 0px; }
+}
+
+.deleteImg{
+    padding:4px 0px;
+}
