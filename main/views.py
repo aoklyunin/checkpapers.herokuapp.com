@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login as auth_login
 
 from main.forms import PaperForm
-from misc.checkPapers import checkPaper
+from misc.checkPapers import checkPaper, createPaper
 from .models import Greeting, Paper
 
 
@@ -40,16 +40,10 @@ def check(request):
             if form.cleaned_data["text"] == "":
                 # выводим сообщение и перезаполняем форму
                 messages.error(request, "Вы послали на проверку пустую статью")
-
             else:
-                papers = Paper.objects.all()
-                u = checkPaper(form.cleaned_data["text"], papers)
-                Paper.objects.create(
-                    author=request.user,
-                    text=form.cleaned_data["text"],
-                    uniquenessPercent=u
-                )
-            messages.info(request, "Уникальность текста: " + f"{u:.{1}f}%".format(u))
+                u = createPaper(form.cleaned_data["text"], request.user)
+                messages.info(request, "Уникальность текста: " + f"{u:.{1}f}%".format(u))
+                return HttpResponseRedirect("/personal")
             # перерисовываем окно
             return render(request, "check.html", {
                 'form': PaperForm(initial=data),

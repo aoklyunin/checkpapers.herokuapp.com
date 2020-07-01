@@ -3,3 +3,5 @@ gunicorn
 django-heroku
 django-postgres-unlimited-varchar
 django-crispy-forms
+numpy
+wikipedia

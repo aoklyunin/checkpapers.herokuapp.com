@@ -13,3 +13,4 @@ class Paper(models.Model):
     text = UnlimitedCharField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     uniquenessPercent = models.FloatField(default=-1)
+    shilds = UnlimitedCharField(default="")

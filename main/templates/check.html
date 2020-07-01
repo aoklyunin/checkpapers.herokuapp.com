@@ -20,16 +20,15 @@
 {% endblock %}
 
 {% block body_content %}
-
-<div class="row justify-content-center need-autherification">
-    <div class="col-lg-6">
-        <div class="title-row text-center">
-            <p class="section-description">Этот раздел доступен только авторизованным пользователям</p>
-            <a href="login" ><button type="submit" class="btn btn-success"> Войти </button></a>
-        </div>
+<div class="row justify-content-center check-row">
+    <div class="col-lg-8">
+        <form role="form" action="" method="post" align="center">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.text|as_crispy_field }}
+            </div>
+            <button type="submit" class="btn btn-success">Проверить</button>
+        </form>
     </div>
 </div>
-
-{% endif %}
-
 {% endblock %}
