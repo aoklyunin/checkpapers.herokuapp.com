@@ -24,6 +24,10 @@ def test(request):
 
 # Create your views here.
 def check(request):
+    # return HttpResponse('Hello from Python!')
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect("/needlogin")
+
     # если post запрос
     if request.method == 'POST':
         # строим форму на основе запроса
@@ -78,17 +82,13 @@ def personal(request):
             "paperCount": len(papers)
         })
     else:
-        return render(request, "personal.html", {
-            "papers": [],
-            "paperCount": 0
-        })
+        return HttpResponseRedirect("/needlogin")
 
 
 def deletePaper(request, paper_id):
     # return HttpResponse('Hello from Python!')
     if not request.user.is_authenticated:
-        messages.error(request, "статьи может удалять только авторизованный пользователь")
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect("/needlogin")
 
     try:
         paper = Paper.objects.get(pk=paper_id)
@@ -97,7 +97,11 @@ def deletePaper(request, paper_id):
         else:
             paper.delete()
     except:
-        messages.error(request, "статья с id "+str(paper_id)+" не найдена")
+        messages.error(request, "статья с id " + str(paper_id) + " не найдена")
 
     return HttpResponseRedirect("/personal")
 
+
+def needLogin(request):
+    # return HttpResponse('Hello from Python!')
+    return render(request, "needlogin.html")

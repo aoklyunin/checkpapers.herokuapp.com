@@ -17,8 +17,6 @@
 {% endblock %}
 
 {% block body_content %}
-{% if user.is_authenticated %}
-
 <div class="row justify-content-center">
     <div class="col-lg-6">
         <div class="title-row text-center">
@@ -68,18 +66,5 @@
 </div>
 </div>
 
-{% else %}
-<div class="row justify-content-center need-autherification">
-    <div class="col-lg-6">
-        <div class="title-row text-center">
-            <p class="section-description">Этот раздел доступен только авторизованным пользователям</p>
-            <a href="login">
-                <button type="submit" class="btn btn-success"> Войти</button>
-            </a>
-        </div>
-    </div>
-</div>
-
-{% endif %}
 
 {% endblock body_content %}
