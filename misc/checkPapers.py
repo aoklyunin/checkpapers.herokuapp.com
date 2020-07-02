@@ -71,6 +71,7 @@ def checkPaper(currentPaper):
     for shild in currentPaperShilds:
         try:
             searchUrls = [str(result["url"]) for result in yandex.search('"' + shild + '"').items[:10]]
+            print(searchUrls)
             urlList.update(searchUrls)
         except :
             pass
