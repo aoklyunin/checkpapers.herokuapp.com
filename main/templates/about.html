@@ -5,6 +5,9 @@
     <a href="/" class="nav-link">Главная</a>
 </li>
 <li>
+    <a href="papers" class="nav-link">Статьи</a>
+</li>
+<li>
     <a href="personal" class="nav-link">Мои статьи</a>
 </li>
 <li>
@@ -17,26 +20,26 @@
 
 {% block body_content %}
 <!-- About -->
-        <div class="about__holder">
-            <div class="about__img-holder">
-                        <img src="{% static 'img/about/about-min.jpg'%}" alt="about us">
+<div class="about__holder">
+    <div class="about__img-holder">
+        <img src="{% static 'img/about/about-min.jpg'%}" alt="about us">
+
+    </div>
+
+    <div class="about__info">
+        <div class="animate">
+            <div class="animate-container">
+                <div class="title-row mb-40">
+                    <h3 class="section-subtitle section-subtitle--line">О проекте</h3>
+                    <h2 class="section-title">Проверка статей на уникальность</h2>
+                    <p class="section-description">Это тестовове задание</p>
+                </div>
+
 
             </div>
-
-            <div class="about__info">
-                <div class="animate">
-                    <div class="animate-container">
-                        <div class="title-row mb-40">
-                            <h3 class="section-subtitle section-subtitle--line">О проекте</h3>
-                            <h2 class="section-title">Проверка статей на уникальность</h2>
-                            <p class="section-description">Это тестовове задание</p>
-                        </div>
-
-
-                    </div>
-                </div>
-            </div> <!-- end about__info -->
-
         </div>
+    </div> <!-- end about__info -->
+
+</div>
 
 {% endblock body_content %}

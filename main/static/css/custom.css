@@ -111,7 +111,6 @@ color: #FE5900;
 	padding: 0px 40px;
 	position: relative; }
 
-
 @media only screen and (min-width: 576px) {
 	.papers-row  {
 		display: -webkit-box;
@@ -121,7 +120,7 @@ color: #FE5900;
 
 @media only screen and (min-width: 992px) {
 	.papers-row {
-		padding: 0px 20px 490px 40px; }
+		padding: 0px 20px 10px 40px; }
  }
 
 @media (min-width: 1280px) {
@@ -129,12 +128,12 @@ color: #FE5900;
 		-webkit-box-align: center;
 		        align-items: center;
 		margin-left: auto;
-		padding: 0px 0px 490px 0px;
+		padding: 0px 0px 10px 0px;
 		} }
 
 @media (min-width: 1600px) {
 	.papers-row {
-		padding: 0px 0px 490px 0px; }
+		padding: 0px 0px 10px 0px; }
 }
 
 .deleteImg{
@@ -202,3 +201,8 @@ color: #FE5900;
 	height: 150px;
 	font-size: 20;
 
+.paper-section-title {
+	margin-bottom: 5px; }
+
+.paper-title-row {
+		margin-bottom: 20px; }

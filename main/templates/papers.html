@@ -1,0 +1,115 @@
+{% extends "nonMainBase.html" %}
+{% load static %}
+{% load humanize %}
+
+{%block title%}
+{% if flgAllPapers %}
+Статьи
+{%else%}
+Мои статьи
+{%endif%}
+{%endblock %}
+
+{% block nav %}
+<li>
+    <a href="/" class="nav-link">Главная</a>
+</li>
+{% if flgAllPapers %}
+<li>
+    <a href="/papers" class="nav-link active">Статьи</a>
+</li>
+<li>
+    <a href="/personal" class="nav-link">Мои статьи</a>
+</li>
+{%else%}
+<li>
+    <a href="/papers" class="nav-link">Статьи</a>
+</li>
+<li>
+    <a href="/personal" class="nav-link active">Мои статьи</a>
+</li>
+{%endif%}
+<li>
+    <a href="/check" class="nav-link">Проверить</a>
+</li>
+<li>
+    <a href="/about" class="nav-link">О проекте</a>
+</li>
+{% endblock %}
+
+{% block body_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="paper-title-row text-center">
+            <h2 class="paper-section-title">{% if flgAllPapers %}Статьи{%else%}Мои статьи{%endif%}</h2>
+        </div>
+        {% ifequal paperCount 0 %}
+        <div class="title-row text-center">
+            <p class="section-description">Пока что у Вас нет проверенных статей</p>
+        </div>
+        {% endifequal %}
+    </div>
+</div>
+
+<div class="row papers-row">
+    <div class="col-lg-12">
+        <table border=0 width="100%">
+            {% if paperCount > 0 %}
+            <thead>
+            <td align="center">
+                <b>Текст статьи</b>
+            </td>
+            <td align="center">
+                <b>Уникальность</b>
+            </td>
+            <td align="center">
+                <b>{% if flgAllPapers %}
+                    Автор
+                    {% else %}
+                    Удалить
+                    {% endif %}
+                </b>
+            </td>
+            </thead>
+            {%endif%}
+            {% for paper in papers %}
+            <tr>
+                <td>
+                    {{ paper.text |truncatechars:300 }}
+                </td>
+                <td align="center">
+                    {{paper.uniquenessPercent|floatformat:2|intcomma}}%
+                </td>
+                <td align="center">
+                    {% if flgAllPapers %}
+                    {{request.user.username}}
+                    {% else %}
+                    <a href="deletepaper/{{paper.id}}">
+                        <img src="{%static 'img/deleteButton.png'%}" width=15px height=15px class="deleteImg"
+                             title="Удалить статью">
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% include "pagination.html" with page=papers %}
+    </div>
+</div>
+
+{% endblock body_content %}
+
+{%block style%}
+
+table.no-border-table > thead > tr > th,
+table.no-border-table > tbody > tr > th,
+table.no-border-table > tfoot > tr > th,
+table.no-border-table > thead > tr > td,
+table.no-border-table > tbody > tr > td,
+table.no-border-table > tfoot > tr > td {
+border: none;
+padding: 10px;
+letter-spacing: -0.05em;
+}
+
+{%endblock%}

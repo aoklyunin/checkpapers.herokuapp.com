@@ -23,8 +23,11 @@ urlpatterns = [
     path("logout", main.auth.logout_view, name="logout_view"),
     path("register", main.auth.register, name="register"),
     path("about", main.views.about, name="about"),
-    path("personal", main.views.personal, name="personal"),
+    path("personal", main.views.personalFirsPage, name="personalFirsPage"),
+    path("personal/<int:page>", main.views.personal, name="personal"),
+    path("papers", main.views.papersFirsPage, name="papersFirsPage"),
+    path("papers/<int:page>", main.views.papers, name="papers"),
     path("needlogin", main.views.needLogin, name="needlogin"),
-    path("deletepaper/<int:paper_id>/", main.views.deletePaper, name="deletepaper"),
+    path("deletepaper/<int:paper_id>", main.views.deletePaper, name="deletepaper"),
     path("admin/", admin.site.urls),
 ]

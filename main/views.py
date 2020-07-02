@@ -1,6 +1,8 @@
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
+from django.core import paginator
+from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login as auth_login
@@ -66,14 +68,52 @@ def about(request):
     return render(request, "about.html")
 
 
+def personalFirsPage(request):
+    return personal(request, 1)
+
 # Create your views here.
-def personal(request):
+def personal(request, page):
     # return HttpResponse('Hello from Python!')
     if request.user.is_authenticated:
-        papers = Paper.objects.all().filter(author=request.user)
-        return render(request, "personal.html", {
+        paginator = Paginator(Paper.objects.all().filter(author=request.user), 9)
+        try:
+            papers = paginator.page(page)
+        except PageNotAnInteger:
+            papers = paginator.page(1)
+        except EmptyPage:
+            papers = paginator.page(paginator.num_pages)
+
+        return render(request, "papers.html", {
             "papers": papers,
-            "paperCount": len(papers)
+            "paperCount": len(papers),
+            "flgAllPapers": False,
+            "page": page
+        })
+    else:
+        return HttpResponseRedirect("/needlogin")
+
+
+def papersFirsPage(request):
+    return papers(request, 1)
+
+
+# Create your views here.
+def papers(request, page):
+    # return HttpResponse('Hello from Python!')
+    if request.user.is_authenticated:
+        paginator = Paginator(Paper.objects.all(), 9)
+        try:
+            papers = paginator.page(page)
+        except PageNotAnInteger:
+            papers = paginator.page(1)
+        except EmptyPage:
+            papers = paginator.page(paginator.num_pages)
+
+        return render(request, "papers.html", {
+            "papers": papers,
+            "paperCount": len(papers),
+            "flgAllPapers": True,
+            "page": page
         })
     else:
         return HttpResponseRedirect("/needlogin")
@@ -90,6 +130,7 @@ def deletePaper(request, paper_id):
             messages.error(request, "Вы не можете удалять чужые статьи")
         else:
             paper.delete()
+            messages.info(request, "Статья удалена")
     except:
         messages.error(request, "статья с id " + str(paper_id) + " не найдена")
 
