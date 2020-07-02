@@ -206,6 +206,13 @@ color: #FE5900;
 .paper-title-row {
 		margin-bottom: 20px; }
 
+/*-------------------------------------------------------*/
+/* Register form
+/*-------------------------------------------------------*/
+.register_form {
+width: 500px;
+margin: 0 auto;
+}
 
 /*-------------------------------------------------------*/
 /* Process indicator
@@ -269,3 +276,4 @@ color: #FE5900;
 	width: 100%;
 	height: 150px;
 	font-size: 20;
+

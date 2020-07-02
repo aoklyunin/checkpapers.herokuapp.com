@@ -37,7 +37,7 @@
 </li>
 {% endblock %}
 
-{% block body_content %}
+{% block bodyContent %}
 <div class="row justify-content-center">
     <div class="col-lg-6">
         <div class="paper-title-row text-center">
@@ -55,25 +55,25 @@
     <div class="col-lg-12">
         <table border=0 width="100%">
             {% if paperCount > 0 %}
-            <thead>
-            <td align="center">
-                <b>Текст статьи</b>
-            </td>
-            <td align="center">
-                <b>Уникальность</b>
-            </td>
-            <td align="center">
-                <b>Правдивость</b>
-            </td>
-            <td align="center">
-                <b>{% if flgAllPapers %}
-                    Автор
-                    {% else %}
-                    Удалить
-                    {% endif %}
-                </b>
-            </td>
-            </thead>
+            <tr>
+                <th align="center">
+                    <b>Текст статьи</b>
+                </th>
+                <th align="center">
+                    <b>Уникальность</b>
+                </th>
+                <th align="center">
+                    <b>Правдивость</b>
+                </th>
+                <th align="center">
+                    <b>{% if flgAllPapers %}
+                        Автор
+                        {% else %}
+                        Удалить
+                        {% endif %}
+                    </b>
+                </th>
+            </tr>
             {%endif%}
             {% for paper in papers %}
             <tr>
@@ -105,7 +105,7 @@
     </div>
 </div>
 
-{% endblock body_content %}
+{% endblock %}
 
 {%block style%}
 
