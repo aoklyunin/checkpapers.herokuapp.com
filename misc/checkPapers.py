@@ -76,10 +76,10 @@ def checkPaper(currentPaper):
             searchUrls = [str(result["url"]) for result in yandex.search('"' + shild + '"').items[:10]]
             # print(searchUrls)
             urlList.update(searchUrls)
-        except:
-            print("error search " + shild)
+        except yandex_search.ConfigException:
+            print("error search: указан неверный ip адрес ")
             return [-1, 0]
-            pass
+            #pass
     print(urlList)
     for url in urlList:
         deltaTime = time.time() - startTime
