@@ -47,6 +47,7 @@ def createPaper(text, name, author):
 
 
 def getShilds(text, shildLength):
+    text.replace("\n", " ")
     textWithSpaces = re.sub(r'[^A-zА-я0-9 ]', '', text)
     textWithOneSpace = re.sub(r'\s+', ' ', textWithSpaces)
     words = textWithOneSpace.split(" ")
@@ -68,12 +69,14 @@ def checkPaper(currentPaper):
     startTime = time.time()
     urlList = set()
     for shild in currentPaperShilds:
-        #print(shild)
-        urlList.update([str(result["url"]) for result in yandex.search('"' + shild + '"').items[:20]])
+        try:
+            urlList.update([str(result["url"]) for result in yandex.search('"' + shild + '"').items[:10]])
+        except:
+            pass
 
     for url in urlList:
         deltaTime = time.time() - startTime
-        #print(str(round(deltaTime / 60)) + " " + url)
+        print(str(round(deltaTime / 60)) + " " + url)
         if (deltaTime > 60 * 5):
             break
         if "youtube" in url:
@@ -82,7 +85,7 @@ def checkPaper(currentPaper):
             if "wikipedia" in url:
                 articleName = (url.split("/"))[-1].replace("_", " ")
                 text = wikipedia.page(articleName).summary
-                #print(">"+text)
+                # print(">"+text)
             else:
                 req = Request(url, headers={'User-Agent': "Magic Browser"})
                 text = text_from_html(urlopen(req).read())
@@ -96,12 +99,12 @@ def checkPaper(currentPaper):
 
     sumU = 0
     sumT = 0
-    print("non finded shilds:")
+    # print("non finded shilds:")
     for i in range(len(findShildCnt)):
         if findShildCnt[i] > 5:
             sumT = sumT + 1
         if findShildCnt[i]:
             sumU = sumU + 1
-        else:
-            print(currentPaperShilds[i])
+        # else:
+        # print(currentPaperShilds[i])
     return [(1 - float(sumU) / len(findShildCnt)) * 100, float(sumT / len(findShildCnt)) * 100]
