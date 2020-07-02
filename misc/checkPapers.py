@@ -9,7 +9,6 @@ from main.models import Paper
 
 
 def createPaper(text, author):
-
     u = checkPaper(text, Paper.objects.all())
     Paper.objects.create(
         author=author,
@@ -31,14 +30,15 @@ def getShilds(text, shildLength):
     return shilds
 
 
-
 def checkPaper(currentPaper, paperLst):
     currentPaperShilds = getShilds(currentPaper, 3)
+    if len(currentPaperShilds) == 0:
+        return 0
     flgFindShild = numpy.zeros(len(currentPaperShilds))
-    #print(currentPaperShilds)
+    # print(currentPaperShilds)
     for paper in paperLst:
         for shild in paper.shilds.split(";"):
-            #print(shild)
+            # print(shild)
             if shild in currentPaperShilds:
                 flgFindShild[currentPaperShilds.index(shild)] = True
 
@@ -46,6 +46,6 @@ def checkPaper(currentPaper, paperLst):
     for i in range(len(flgFindShild)):
         if flgFindShild[i]:
             sum = sum + 1
-        #else:
-            #print(currentPaperShilds[i])
+        # else:
+        # print(currentPaperShilds[i])
     return (1 - float(sum) / len(flgFindShild)) * 100

@@ -19,10 +19,14 @@
 </li>
 {% endblock %}
 
+{% block processText %}
+Выполняется проверка...
+{% endblock %}
 {% block body_content %}
+
 <div class="row justify-content-center check-row">
     <div class="col-lg-8">
-        <form role="form" action="" method="post" align="center">
+        <form role="form" action="" method="post" align="center" onsubmit="submitform(this);return false;">
             {% csrf_token %}
             <div class="form-group">
                 {{ form.text|as_crispy_field }}
@@ -31,4 +35,15 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block script %}
+<script>
+   function submitform(f) {
+   	    $('.process').css('display','block');
+   	    $('.process-text').css('display','block');
+   	    $('.process-mask').css('display','block');
+        f.submit();
+   }
+</script>
 {% endblock %}

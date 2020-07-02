@@ -32,8 +32,6 @@
     <style>
 		{%block style%}
 		{%endblock %}
-
-
     </style>
 </head>
 
@@ -42,6 +40,17 @@
 <div class="loader-mask">
     <div class="loader">
         "Loading..."
+    </div>
+</div>
+
+
+<div class="process-mask">
+    <div class="process">
+        "Loading..."
+    </div>
+    <div class = "process-text">
+        {% block processText %}
+        {% endblock %}
     </div>
 </div>
 <!-- Header -->

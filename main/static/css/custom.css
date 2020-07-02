@@ -1,5 +1,3 @@
-/*! Paste your custom styles here */
-
 .alert{
     height: 48px;
     border-radius: 0;
@@ -142,3 +140,65 @@ color: #FE5900;
 .deleteImg{
     padding:4px 0px;
 }
+
+
+.process-mask {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 100vh;
+	background-color: #000000;
+	z-index: 99999; }
+
+.process {
+	display: none;
+	position: relative;
+	left: 50%;
+	top: 50%;
+	width: 150px;
+	height: 150px;
+	font-size: 0;
+	margin: -75px 0 0 -75px;
+	border-radius: 50%;
+	border: 3px solid transparent;
+	border-top-color: #FE5900;
+	-webkit-animation: spin 1.7s linear infinite;
+	        animation: spin 1.7s linear infinite;
+	z-index: 11; }
+	.process:before {
+		content: "";
+		position: absolute;
+		top: 5px;
+		left: 5px;
+		right: 5px;
+		bottom: 5px;
+		border-radius: 50%;
+		border: 3px solid transparent;
+		border-top-color: #FE5900;
+		-webkit-animation: spin-reverse .6s linear infinite;
+		        animation: spin-reverse .6s linear infinite; }
+	.process:after {
+		content: "";
+		position: absolute;
+		top: 15px;
+		left: 15px;
+		right: 15px;
+		bottom: 15px;
+		border-radius: 50%;
+		border: 3px solid transparent;
+		border-top-color: #FE5900;
+		-webkit-animation: spin 1s linear infinite;
+		        animation: spin 1s linear infinite; }
+
+.process-text {
+	display: none;
+	position: absolute;
+    text-align: center;
+	top: 65%;
+	width: 100%;
+	height: 150px;
+	font-size: 20;
+
