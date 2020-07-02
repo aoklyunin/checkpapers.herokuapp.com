@@ -10,6 +10,7 @@ import numpy
 import yandex_search
 from bs4 import BeautifulSoup
 from wikipedia import wikipedia
+from django.db import connection
 
 from main.models import Paper
 
@@ -39,6 +40,9 @@ def createPaper(text, name, author):
     [u, t] = checkPaper(text)
     if (u == -1):
         return [u, t]
+    # из-за долгого времени ожидания соединение обрывается
+    # нужно его перезапускать
+    connection.connect()
     Paper.objects.create(
         name=name,
         author=author,
@@ -72,6 +76,7 @@ def checkPaper(currentPaper):
     startTime = time.time()
     urlList = set()
     for shild in currentPaperShilds:
+        #print(shild)
         try:
             searchUrls = [str(result["url"]) for result in yandex.search('"' + shild + '"').items[:10]]
             # print(searchUrls)
@@ -79,29 +84,27 @@ def checkPaper(currentPaper):
         except yandex_search.ConfigException:
             print("error search: указан неверный ip адрес ")
             return [-1, 0]
-            #pass
-    print(urlList)
+            # pass
+    #print(urlList)
     for url in urlList:
         deltaTime = time.time() - startTime
-        # print(str(round(deltaTime / 60)) + " " + url)
-        if (deltaTime > 60 * 5):
+        #print(str(round(deltaTime / 60)) + " " + url)
+        if deltaTime > 60 * 2:
             break
-        if "youtube" in url:
-            continue
         try:
             if "wikipedia" in url:
                 articleName = (url.split("/"))[-1].replace("_", " ")
                 text = wikipedia.page(articleName).summary
                 # print(">"+text)
-                # else:
-                #   req = Request(url, headers={'User-Agent': "Magic Browser"})
-                #   text = text_from_html(urlopen(req).read())
-                findedshilds = getShilds(text, SHILD_LENGTH)
-                print(findedshilds)
-                for findedshild in findedshilds:
-                    if findedshild in currentPaperShilds:
-                        index = currentPaperShilds.index(findedshild)
-                        findShildCnt[index] = findShildCnt[index] + 1
+            else:
+                req = Request(url, headers={'User-Agent': "Magic Browser"})
+                text = text_from_html(urlopen(req).read())
+            findedshilds = getShilds(text, SHILD_LENGTH)
+            # print(findedshilds)
+            for findedshild in findedshilds:
+                if findedshild in currentPaperShilds:
+                    index = currentPaperShilds.index(findedshild)
+                    findShildCnt[index] = findShildCnt[index] + 1
         except:
             pass
             print("error loading page: " + url)
@@ -110,12 +113,12 @@ def checkPaper(currentPaper):
     sumT = 0
     # print("non finded shilds:")
     for i in range(len(findShildCnt)):
-        print(currentPaperShilds[i] + " " + str(findShildCnt[i]))
+        #print(currentPaperShilds[i] + " " + str(findShildCnt[i]))
         if findShildCnt[i] > 3:
             sumT = sumT + 1
         if findShildCnt[i]:
             sumU = sumU + 1
         # else:
 
-    print([sumU, sumT])
+    #print([sumU, sumT])
     return [(1 - float(sumU) / len(findShildCnt)) * 100, float(sumT) / len(findShildCnt) * 100]
