@@ -37,6 +37,8 @@ def getShildsFromPaper(paper):
 
 def createPaper(text, name, author):
     [u, t] = checkPaper(text)
+    if (u == -1):
+        return [u, t]
     Paper.objects.create(
         name=name,
         author=author,
@@ -76,6 +78,7 @@ def checkPaper(currentPaper):
             urlList.update(searchUrls)
         except:
             print("error search " + shild)
+            return [-1, 0]
             pass
     print(urlList)
     for url in urlList:

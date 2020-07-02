@@ -51,8 +51,12 @@ def check(request):
                 messages.error(request, "Вы послали на проверку статью без текста")
             else:
                 [u, t] = createPaper(form.cleaned_data["text"], form.cleaned_data["name"], request.user)
-                messages.info(request, "Уникальность текста: " + f"{u:.{1}f}%".format(
-                    u) + ", правдивость: " + f"{u:.{1}f}%".format(t))
+                if u < 0:
+                    messages.error("выполнено максимальное кол-во поисковых запросов, попробуйте поже")
+                    return HttpResponseRedirect("/check")
+                else:
+                    messages.info(request, "Уникальность текста: " + f"{u:.{1}f}%".format(
+                        u) + ", правдивость: " + f"{u:.{1}f}%".format(t))
                 return HttpResponseRedirect("/personal")
             # перерисовываем окно
             return render(request, "check.html", {
