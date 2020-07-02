@@ -1,3 +1,6 @@
+/*-------------------------------------------------------*/
+/* Alert
+/*-------------------------------------------------------*/
 .alert{
     height: 48px;
     border-radius: 0;
@@ -10,10 +13,16 @@
     transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
 }
 
+/*-------------------------------------------------------*/
+/* a nav link for mobile
+/*-------------------------------------------------------*/
 a.nav-link:hover {
 color: #FE5900;
 }
 
+/*-------------------------------------------------------*/
+/* Login row
+/*-------------------------------------------------------*/
 .login-row {
 	background-color: #fff;
 	padding: 40px 40px;
@@ -45,6 +54,9 @@ color: #FE5900;
 		padding: 160px 0px 320px 0px; }
 }
 
+/*-------------------------------------------------------*/
+/* Register row
+/*-------------------------------------------------------*/
 .register-row {
 	background-color: #fff;
 	padding: 40px 40px;
@@ -75,6 +87,10 @@ color: #FE5900;
 	.register-row {
 		padding: 60px 0px 180px 0px; }
 }
+
+/*-------------------------------------------------------*/
+/* Need autherification
+/*-------------------------------------------------------*/
 .need-autherification {
 	background-color: #fff;
 	padding: 220px 40px;
@@ -106,6 +122,9 @@ color: #FE5900;
 		padding: 260px 0px 230px 0px; }
 }
 
+/*-------------------------------------------------------*/
+/* Papers row
+/*-------------------------------------------------------*/
 .papers-row {
 	background-color: #fff;
 	padding: 0px 40px;
@@ -136,6 +155,10 @@ color: #FE5900;
 		padding: 0px 0px 450px 0px; }
 }
 
+
+/*-------------------------------------------------------*/
+/* Read paper row
+/*-------------------------------------------------------*/
 .read-paper-row {
 	background-color: #fff;
 	padding: 0px 40px;
@@ -166,11 +189,27 @@ color: #FE5900;
 		padding: 0px 0px 510px 0px; }
 }
 
+
+/*-------------------------------------------------------*/
+/* Delete Img
+/*-------------------------------------------------------*/
 .deleteImg{
     padding:4px 0px;
 }
 
+/*-------------------------------------------------------*/
+/* Paper text
+/*-------------------------------------------------------*/
+.paper-section-title {
+	margin-bottom: 5px; }
 
+.paper-title-row {
+		margin-bottom: 20px; }
+
+
+/*-------------------------------------------------------*/
+/* Process indicator
+/*-------------------------------------------------------*/
 .process-mask {
 	display: none;
 	position: fixed;
@@ -230,9 +269,3 @@ color: #FE5900;
 	width: 100%;
 	height: 150px;
 	font-size: 20;
-
-.paper-section-title {
-	margin-bottom: 5px; }
-
-.paper-title-row {
-		margin-bottom: 20px; }
