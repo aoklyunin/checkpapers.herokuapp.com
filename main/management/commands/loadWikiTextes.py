@@ -1,13 +1,8 @@
 # coding=utf-8
-# программа для загрузки оценок
-import datetime
-
-from django.contrib.auth.models import User
 from django.core.management import BaseCommand
 import wikipedia as wikipedia
 from django.contrib.auth.models import User
 
-from main.models import Paper
 from misc.checkPapers import createPaper
 
 
@@ -31,10 +26,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         user = User.objects.get(username="test")
         for i in range(options['paper_cnt'][0]):
-            print(i)
             text = random_page()
+            name = text[:100] if len(text) > 100 else text
+            print(str(i) + ": " + name)
             print(createPaper(
                 author=user,
-                text=text
+                name=name,
+                text=text,
             ))
-            print(text)

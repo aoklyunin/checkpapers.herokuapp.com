@@ -36,15 +36,22 @@ def check(request):
         form = PaperForm(request.POST)
         # если форма заполнена корректно
         if form.is_valid():
-            data = {'text': form.cleaned_data["text"]
-                    }
+            data = {
+                'text': form.cleaned_data["text"],
+                'name': form.cleaned_data["name"],
+            }
             # проверяем, что пароли совпадают
             if form.cleaned_data["text"] == "":
                 # выводим сообщение и перезаполняем форму
-                messages.error(request, "Вы послали на проверку пустую статью")
+                messages.error(request, "Вы послали на проверку статью без текста")
+                # проверяем, что пароли совпадают
+            elif form.cleaned_data["name"] == "":
+                # выводим сообщение и перезаполняем форму
+                messages.error(request, "Вы послали на проверку статью без текста")
             else:
-                u = createPaper(form.cleaned_data["text"], request.user)
-                messages.info(request, "Уникальность текста: " + f"{u:.{1}f}%".format(u))
+                [u, t] = createPaper(form.cleaned_data["text"], form.cleaned_data["name"], request.user)
+                messages.info(request, "Уникальность текста: " + f"{u:.{1}f}%".format(
+                    u) + ", правдивость: " + f"{u:.{1}f}%".format(t))
                 return HttpResponseRedirect("/personal")
             # перерисовываем окно
             return render(request, "check.html", {
@@ -71,11 +78,12 @@ def about(request):
 def personalFirsPage(request):
     return personal(request, 1)
 
+
 # Create your views here.
 def personal(request, page):
     # return HttpResponse('Hello from Python!')
     if request.user.is_authenticated:
-        paginator = Paginator(Paper.objects.all().filter(author=request.user), 9)
+        paginator = Paginator(Paper.objects.all().filter(author=request.user), 12)
         try:
             papers = paginator.page(page)
         except PageNotAnInteger:
@@ -101,7 +109,7 @@ def papersFirsPage(request):
 def papers(request, page):
     # return HttpResponse('Hello from Python!')
     if request.user.is_authenticated:
-        paginator = Paginator(Paper.objects.all(), 9)
+        paginator = Paginator(Paper.objects.all(), 12)
         try:
             papers = paginator.page(page)
         except PageNotAnInteger:
@@ -140,3 +148,14 @@ def deletePaper(request, paper_id):
 def needLogin(request):
     # return HttpResponse('Hello from Python!')
     return render(request, "needlogin.html")
+
+
+def readPaper(request, paper_id):
+    try:
+        paper = Paper.objects.get(pk=paper_id)
+        return render(request, "readPaper.html", {
+            "paper": paper
+        })
+    except:
+        messages.error(request, "статья с id " + str(paper_id) + " не найдена")
+        return HttpResponseRedirect("/personal")

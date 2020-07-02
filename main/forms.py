@@ -35,6 +35,9 @@ class RegisterForm(forms.Form):
 
 
 class PaperForm(forms.Form):
+    name = forms.CharField(widget=forms.Textarea(attrs={'rows': 1, 'cols': 100, 'placeholder': 'название'}),
+                           label="Название статьи")
+
     text = forms.CharField(widget=forms.Textarea(
-        attrs={'rows': 25, 'cols': 100, 'placeholder': 'текст, который нужно проверить на уникальность'}),
-                          label="Текст статьи")
+        attrs={'rows': 20, 'cols': 100, 'placeholder': 'текст, который нужно проверить на уникальность'}),
+        label="Текст статьи")

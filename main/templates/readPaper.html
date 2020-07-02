@@ -1,0 +1,49 @@
+{% extends "nonMainBase.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{paper.name}}{% endblock %}
+
+{% block nav %}
+<li>
+    <a href="/" class="nav-link">Главная</a>
+</li>
+<li>
+    <a href="/papers" class="nav-link">Статьи</a>
+</li>
+<li>
+    <a href="/personal" class="nav-link">Мои статьи</a>
+</li>
+<li>
+    <a href="/check" class="nav-link">Проверить</a>
+</li>
+<li>
+    <a href="/about" class="nav-link">О проекте</a>
+</li>
+{% endblock %}
+
+{% block processText %}
+Выполняется проверка...
+{% endblock %}
+{% block body_content %}
+
+<div class="row justify-content-center read-paper-row">
+    <div class="col-lg-8">
+        <div class="paper-title-row text-center">
+            <h2 class="paper-section-title">{{paper.name}}</h2>
+        </div>
+        {{paper.text}}
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+   function submitform(f) {
+   	    $('.process').css('display','block');
+   	    $('.process-text').css('display','block');
+   	    $('.process-mask').css('display','block');
+        f.submit();
+   }
+</script>
+{% endblock %}

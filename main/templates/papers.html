@@ -63,6 +63,9 @@
                 <b>Уникальность</b>
             </td>
             <td align="center">
+                <b>Правдивость</b>
+            </td>
+            <td align="center">
                 <b>{% if flgAllPapers %}
                     Автор
                     {% else %}
@@ -75,10 +78,15 @@
             {% for paper in papers %}
             <tr>
                 <td>
-                    {{ paper.text |truncatechars:300 }}
+                    <a href="/readpaper/{{paper.id}}">
+                        {{ paper.name| truncatechars:100}}
+                    </a>
                 </td>
                 <td align="center">
                     {{paper.uniquenessPercent|floatformat:2|intcomma}}%
+                </td>
+                <td align="center">
+                    {{paper.truth|floatformat:2|intcomma}}%
                 </td>
                 <td align="center">
                     {% if flgAllPapers %}

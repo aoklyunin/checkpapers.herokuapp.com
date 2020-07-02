@@ -26,6 +26,7 @@ urlpatterns = [
     path("personal", main.views.personalFirsPage, name="personalFirsPage"),
     path("personal/<int:page>", main.views.personal, name="personal"),
     path("papers", main.views.papersFirsPage, name="papersFirsPage"),
+    path("readpaper/<int:paper_id>", main.views.readPaper, name="readPaper"),
     path("papers/<int:page>", main.views.papers, name="papers"),
     path("needlogin", main.views.needLogin, name="needlogin"),
     path("deletepaper/<int:paper_id>", main.views.deletePaper, name="deletepaper"),

@@ -120,7 +120,7 @@ color: #FE5900;
 
 @media only screen and (min-width: 992px) {
 	.papers-row {
-		padding: 0px 20px 10px 40px; }
+		padding: 0px 20px 450px 40px; }
  }
 
 @media (min-width: 1280px) {
@@ -128,12 +128,42 @@ color: #FE5900;
 		-webkit-box-align: center;
 		        align-items: center;
 		margin-left: auto;
-		padding: 0px 0px 10px 0px;
+		padding: 0px 0px 450px 0px;
 		} }
 
 @media (min-width: 1600px) {
 	.papers-row {
-		padding: 0px 0px 10px 0px; }
+		padding: 0px 0px 450px 0px; }
+}
+
+.read-paper-row {
+	background-color: #fff;
+	padding: 0px 40px;
+	position: relative; }
+
+@media only screen and (min-width: 576px) {
+	.read-paper-row  {
+		display: -webkit-box;
+		display: flex;
+		flex-wrap: nowrap; }
+}
+
+@media only screen and (min-width: 992px) {
+	.read-paper-row {
+		padding: 0px 20px 510px 40px; }
+ }
+
+@media (min-width: 1280px) {
+    .read-paper-row {
+		-webkit-box-align: center;
+		        align-items: center;
+		margin-left: auto;
+		padding: 0px 0px 510px 0px;
+		} }
+
+@media (min-width: 1600px) {
+	.read-paper-row {
+		padding: 0px 0px 510px 0px; }
 }
 
 .deleteImg{
