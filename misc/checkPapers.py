@@ -101,7 +101,7 @@ def checkPaper(currentPaper):
     sumT = 0
     # print("non finded shilds:")
     for i in range(len(findShildCnt)):
-        print(currentPaperShilds+" "+str(findShildCnt[i]))
+        print(currentPaperShilds[i] + " " + str(findShildCnt[i]))
         if findShildCnt[i] > 3:
             sumT = sumT + 1
         if findShildCnt[i]:
