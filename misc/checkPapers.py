@@ -73,7 +73,7 @@ def checkPaper(currentPaper):
             urlList.update([str(result["url"]) for result in yandex.search('"' + shild + '"').items[:10]])
         except:
             pass
-
+    print(urlList)
     for url in urlList:
         deltaTime = time.time() - startTime
         print(str(round(deltaTime / 60)) + " " + url)
@@ -101,7 +101,8 @@ def checkPaper(currentPaper):
     sumT = 0
     # print("non finded shilds:")
     for i in range(len(findShildCnt)):
-        if findShildCnt[i] > 5:
+        print(currentPaperShilds+" "+str(findShildCnt[i]))
+        if findShildCnt[i] > 3:
             sumT = sumT + 1
         if findShildCnt[i]:
             sumU = sumU + 1
