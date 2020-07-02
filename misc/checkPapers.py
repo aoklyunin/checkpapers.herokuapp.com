@@ -70,8 +70,9 @@ def checkPaper(currentPaper):
     urlList = set()
     for shild in currentPaperShilds:
         try:
-            urlList.update([str(result["url"]) for result in yandex.search('"' + shild + '"').items[:10]])
-        except:
+            searchUrls = [str(result["url"]) for result in yandex.search('"' + shild + '"').items[:10]]
+            urlList.update(searchUrls)
+        except :
             pass
     print(urlList)
     for url in urlList:
