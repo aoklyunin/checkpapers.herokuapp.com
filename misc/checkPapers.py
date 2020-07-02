@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     Возвращает процент уникальности в заданной статье
 """
@@ -71,32 +72,33 @@ def checkPaper(currentPaper):
     for shild in currentPaperShilds:
         try:
             searchUrls = [str(result["url"]) for result in yandex.search('"' + shild + '"').items[:10]]
-            #print(searchUrls)
+            # print(searchUrls)
             urlList.update(searchUrls)
-        except :
+        except:
+            print("error search " + shild)
             pass
     print(urlList)
     for url in urlList:
         deltaTime = time.time() - startTime
-        #print(str(round(deltaTime / 60)) + " " + url)
+        # print(str(round(deltaTime / 60)) + " " + url)
         if (deltaTime > 60 * 5):
             break
         if "youtube" in url:
             continue
         try:
-            #if "wikipedia" in url:
-            articleName = (url.split("/"))[-1].replace("_", " ")
-            text = wikipedia.page(articleName).summary
+            if "wikipedia" in url:
+                articleName = (url.split("/"))[-1].replace("_", " ")
+                text = wikipedia.page(articleName).summary
                 # print(">"+text)
-            #else:
-             #   req = Request(url, headers={'User-Agent': "Magic Browser"})
-             #   text = text_from_html(urlopen(req).read())
-            findedshilds = getShilds(text, SHILD_LENGTH)
-            print(findedshilds)
-            for findedshild in findedshilds:
-                if findedshild in currentPaperShilds:
-                    index = currentPaperShilds.index(findedshild)
-                    findShildCnt[index] = findShildCnt[index] + 1
+                # else:
+                #   req = Request(url, headers={'User-Agent': "Magic Browser"})
+                #   text = text_from_html(urlopen(req).read())
+                findedshilds = getShilds(text, SHILD_LENGTH)
+                print(findedshilds)
+                for findedshild in findedshilds:
+                    if findedshild in currentPaperShilds:
+                        index = currentPaperShilds.index(findedshild)
+                        findShildCnt[index] = findShildCnt[index] + 1
         except:
             pass
             print("error loading page: " + url)

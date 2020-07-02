@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.urls import path
 import main.views
 import main.auth

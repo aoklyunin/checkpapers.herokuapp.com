@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
