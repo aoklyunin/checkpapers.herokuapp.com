@@ -109,5 +109,5 @@ def checkPaper(currentPaper):
         if findShildCnt[i]:
             sumU = sumU + 1
         # else:
-        # print(currentPaperShilds[i])
+        print([sumU, sumT])
     return [(1 - float(sumU) / len(findShildCnt)) * 100, float(sumT) / len(findShildCnt) * 100]
