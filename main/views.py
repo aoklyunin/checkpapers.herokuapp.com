@@ -52,7 +52,7 @@ def check(request):
             else:
                 [u, t] = createPaper(form.cleaned_data["text"], form.cleaned_data["name"], request.user)
                 if u < 0:
-                    messages.error("выполнено максимальное кол-во поисковых запросов, попробуйте поже")
+                    messages.error(request,"выполнено максимальное кол-во поисковых запросов, попробуйте поже")
                     return HttpResponseRedirect("/check")
                 else:
                     messages.info(request, "Уникальность текста: " + f"{u:.{1}f}%".format(
