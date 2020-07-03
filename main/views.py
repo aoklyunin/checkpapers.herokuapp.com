@@ -58,14 +58,22 @@ def encodeData(data):
     return decoded.decode("utf-8")  # Replace utf-8 with the source encoding of your requested resource
 
 
-def loadUrlsYandex(request):
+def loadUrls(request):
     # если post запрос
     if request.method == 'POST':
         user_agent = "'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5)\
                 AppleWebKit/537.36 (KHTML, like Gecko) Cafari/537.36'"
         # for shild in request.session["shilds"]:
+        options = webdriver.ChromeOptions()
+        # options.add_argument('headless')
+        # options.add_argument('window-size=1920x1080')
+        # options.add_argument("disable-gpu")
+        urls = []
+        driver = webdriver.Chrome(CHROMEDRIVER_PATH, options=options)
+
         url = "http://yandex.ru/search"
         headers = {'User-Agent': user_agent, }
+
         if request.POST["state"] == "captcha":
             # print(request.POST)
             url = "http://yandex.ru/checkcaptcha"
@@ -80,38 +88,42 @@ def loadUrlsYandex(request):
             data = response.read()
             # print(str(data, 'utf-8'))
         else:
-            query = urlencode({'text': request.session["shilds"][0]})
-            # print(url + query)
-            request = Request(url + '?' + query, None, headers)
-            response = urlopen(request)
-            data = response.read()
-
-        parser = etree.HTMLParser()
-        tree = etree.fromstring(data, parser)
-        captchaImg = tree.xpath("//div[@class='captcha__image']/img")
-        print(captchaImg)
-        if len(captchaImg) >= 0:
-            key = tree.xpath("//*[@class='form__key']/@value")
-            # print(key)
-            retpath = tree.xpath("//*[@class='form__retpath']/@value")
-            # print(retpath)
-            return JsonResponse({
-                "state": "needCaptcha",
-                "captcha": captchaImg[0].attrib["src"],
-                "key": key,
-                "retpath": retpath
-            })
-        for link in tree.xpath('//a/@href'):
-            print(link)
+            urls = set()
+            for shild in request.session["shilds"]:
+                print(shild)
+                query = urlencode({'text': '"' + shild + '"'})
+                # print(url + query)
+                # request = Request(url + '?' + query, None, headers)
+                driver.get(url + '?' + query)
+                captchaImgs = driver.find_elements_by_xpath("//div[@class='captcha__image']/img")
+                # print(captchaImgs)
+                if len(captchaImgs) > 0:
+                    key = driver.find_element_by_xpath("//*[@class='form__key']/@value")
+                    # print(key)
+                    retpath = driver.find_element_by_xpath("//*[@class='form__retpath']/@value")
+                    # print(retpath)
+                    return JsonResponse({
+                        "state": "needCaptcha",
+                        "captcha": captchaImgs[0].attrib["src"],
+                        "key": key,
+                        "retpath": retpath
+                    })
+                for link in driver.find_elements_by_xpath('//a'):
+                    strLink = str(link.get_attribute("href"))
+                    if (not "yandex" in strLink) and (not "bing" in strLink) and (not "google" in strLink) and (
+                            not "mail" in strLink) and (strLink is not None):
+                        urls.add(strLink)
+                        #print(strLink)
             # if link.startswith('/url?q=') and not link.contains("google.com"):
             # print(link)
+            print("ready")
         return JsonResponse({"state": "ready"})
     else:
         messages.error(request, "этот метод можно вызывать только через POST запрос")
         return HttpResponseRedirect("personal")
 
 
-def loadUrls(request):
+def loadUrlsGoogle(request):
     # если post запрос
     if request.method == 'POST':
         user_agent = "'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5)\
@@ -120,9 +132,9 @@ def loadUrls(request):
         url = "https://www.google.com/search"
         headers = {'User-Agent': user_agent, }
         options = webdriver.ChromeOptions()
-        options.add_argument('headless')
-        options.add_argument('window-size=1920x1080')
-        options.add_argument("disable-gpu")
+        # options.add_argument('headless')
+        # options.add_argument('window-size=1920x1080')
+        # options.add_argument("disable-gpu")
         urls = []
         driver = webdriver.Chrome(CHROMEDRIVER_PATH, options=options)
         for shild in request.session["shilds"]:
@@ -132,31 +144,20 @@ def loadUrls(request):
             if len(driver.find_elements_by_xpath("//a[@href]")) == 0:
                 print("+++++++++++++++++++++ERROR+++++++++++++++++++++++++")
                 print(driver.page_source)
-                return JsonResponse({"state": "ready"})
-            flgError = False
+                return JsonResponse({"state": "needCaptcha"})
+
             for link in driver.find_elements_by_xpath("//a[@href]"):
                 strLink = str(link.get_attribute("href"))
                 if strLink == "http://www.google.ru/policies/terms/":
-                    flgError = True
-                    break
-                    # return JsonResponse({"state": "ready"})
+                    return JsonResponse({"state": "needCaptcha"})
                 if (not "www.google.com" in strLink) and (not "www.google.ru" in strLink) and (
                         not "maps.google.com" in strLink) and (
                         not "support.google.com" in strLink) and (not "policies.google.com" in strLink):
                     urls.append(link.get_attribute('href'))
-            if flgError:
-                driver = webdriver.Chrome(CHROMEDRIVER_PATH, options=options)
-                for link in driver.find_elements_by_xpath("//a[@href]"):
-                    strLink = str(link.get_attribute("href"))
-                    if strLink == "http://www.google.ru/policies/terms/":
-                        return JsonResponse({"state": "ready"})
-                    if (not "www.google.com" in strLink) and (not "www.google.ru" in strLink) and (
-                            not "maps.google.com" in strLink) and (
-                            not "support.google.com" in strLink) and (not "policies.google.com" in strLink):
-                        urls.append(link.get_attribute('href'))
+
         print("ready")
         print(urls)
-        checkPaper(request.session["shilds"],urls)
+        checkPaper(request.session["shilds"], urls)
         return JsonResponse({"state": "ready"})
     else:
         messages.error(request, "этот метод можно вызывать только через POST запрос")
