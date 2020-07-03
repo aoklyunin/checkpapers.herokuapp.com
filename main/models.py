@@ -17,6 +17,3 @@ class Paper(models.Model):
     truth = models.FloatField(default=-1)
     name = UnlimitedCharField(default="")
 
-
-class SeleniumSession(models.Model):
-    _driver = ""
