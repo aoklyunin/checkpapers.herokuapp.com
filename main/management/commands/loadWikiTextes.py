@@ -3,7 +3,7 @@ from django.core.management import BaseCommand
 import wikipedia as wikipedia
 from django.contrib.auth.models import User
 
-from misc.checkPapers import createPaper
+from misc.checkPapers import createPaper, createPaperYandex
 
 
 def random_page():
@@ -29,7 +29,7 @@ class Command(BaseCommand):
             text = random_page()
             name = text[:100] if len(text) > 100 else text
             print(str(i) + ": " + name)
-            print(createPaper(
+            print(createPaperYandex(
                 author=user,
                 name=name,
                 text=text,

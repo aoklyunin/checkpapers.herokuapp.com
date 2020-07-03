@@ -20,7 +20,7 @@ nav__holder nav--sticky nav--align-center sticky offset scrolling
     <!-- From Blog -->
     <section class="section-from-blog pb-96 angle angle--top" id="blog">
         <div class="container">
-             {% if messages %}
+            {% if messages %}
             <div class="row justify-content-center">
                 <div class="col-sm-6 col-sm-offset-3">
                     <table align="center" border="0">
@@ -59,9 +59,12 @@ nav__holder nav--sticky nav--align-center sticky offset scrolling
                     </div>
                 </div> <!-- end about us -->
 
-
                 <div class="col-lg-4 col-md-6">
-
+                    <div class="widget text-center text-md-left">
+                        <a href="/check" class="btn btn--lg btn--stroke contact-form-trigger">
+                            <span>Проверить статью</span>
+                        </a>
+                    </div>
                 </div>
 
                 <div class="col-lg-4 col-md-6">
@@ -89,57 +92,9 @@ nav__holder nav--sticky nav--align-center sticky offset scrolling
 
 <div class="footer-placeholder" id="contact"></div>
 
-<!-- Contact Form -->
-<div class="modal fade contact-form-modal" id="contact-form-modal" role="dialog" aria-label="Contact Form Modal"
-     aria-hidden="true">
-    <div class="modal-dialog contact-form-modal__dialog" role="document">
-        <div class="modal-content contact-form-modal__content">
+{% block modalBlock%}
 
-            <button type="button" class="close contact-form-modal__close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">×</span>
-            </button>
-
-            <div class="modal-body contact-form-modal__body">
-                <form id="contact-form" class="contact-form" action="#">
-                    <div class="row row-16">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label for="name">Name<abbr>*</abbr></label>
-                                <input type="text" name="NAME" id="name" required="">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label for="email">Email<abbr>*</abbr></label>
-                                <input type="email" name="EMAIL" id="email" required="">
-                            </div>
-                        </div>
-                    </div>
-
-                    <label for="message">Message<abbr>*</abbr></label>
-                    <textarea name="MESSAGE" id="message" rows="6"></textarea>
-                    <div class="gdpr-checkbox">
-                        <label class="gdpr-checkbox__label">
-                            <input class="gdpr-checkbox__input" name="AGREE_TO_TERMS" type="checkbox" value="1"
-                                   required="">
-                            <span class="gdpr-checkbox__text">I agree to storage of my email according to <a href="#"
-                                                                                                             target="_blank">Privacy Policy</a>
-									</span>
-                        </label>
-                    </div>
-                    <div class="text-center">
-                        <input id="contact-form__submit" type="submit" class="btn btn--lg btn--color"
-                               value="Send Message">
-                    </div>
-
-                    <div id="contact-form__message" class="contact-form__message" role="alert"></div>
-
-                </form>
-            </div>
-        </div>
-    </div>
-</div> <!-- end contact form -->
-
+{% endblock%}
 
 <div id="back-to-top">
     <a href="#top"><i class="ui-arrow-up"></i></a>

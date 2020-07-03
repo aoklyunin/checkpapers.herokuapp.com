@@ -52,6 +52,22 @@ def createPaper(text, name, author):
     )
     return [u, t]
 
+def createPaperYandex(text, name, author):
+    [u, t] = checkPaperYandex(text)
+    if (u == -1):
+        return [u, t]
+    # из-за долгого времени ожидания соединение обрывается
+    # нужно его перезапускать
+    connection.connect()
+    Paper.objects.create(
+        name=name,
+        author=author,
+        text=text,
+        uniquenessPercent=u,
+        truth=t
+    )
+    return [u, t]
+
 
 def getShilds(text, shildLength):
     text.replace("\n", " ")
@@ -64,19 +80,15 @@ def getShilds(text, shildLength):
         shilds.append(shild)
     return shilds
 
-
-def checkPaper(currentPaper):
+def checkPaperYandex(currentPaper):
     print(currentPaper)
     currentPaperShilds = getShilds(currentPaper, SHILD_LENGTH)
     if len(currentPaperShilds) == 0:
         return 0
-    findShildCnt = numpy.zeros(len(currentPaperShilds))
     yandex = yandex_search.Yandex(api_user='aoklyunin', api_key='03.210671841:b75fddc50ebc4d5938fc5c192bd47964')
-
-    startTime = time.time()
     urlList = set()
     for shild in currentPaperShilds:
-        #print(shild)
+        # print(shild)
         try:
             searchUrls = [str(result["url"]) for result in yandex.search('"' + shild + '"').items[:10]]
             # print(searchUrls)
@@ -85,7 +97,12 @@ def checkPaper(currentPaper):
             print("error search: указан неверный ip адрес ")
             return [-1, 0]
             # pass
-    #print(urlList)
+    # print(urlList)
+    return checkPaper(currentPaperShilds,urlList)
+
+def checkPaper(currentPaperShilds, urlList):
+    findShildCnt = numpy.zeros(len(currentPaperShilds))
+    startTime = time.time()
     for url in urlList:
         deltaTime = time.time() - startTime
         #print(str(round(deltaTime / 60)) + " " + url)
@@ -113,12 +130,12 @@ def checkPaper(currentPaper):
     sumT = 0
     # print("non finded shilds:")
     for i in range(len(findShildCnt)):
-        #print(currentPaperShilds[i] + " " + str(findShildCnt[i]))
+        print(currentPaperShilds[i] + " " + str(findShildCnt[i]))
         if findShildCnt[i] > 3:
             sumT = sumT + 1
         if findShildCnt[i]:
             sumU = sumU + 1
         # else:
 
-    #print([sumU, sumT])
+    print([sumU, sumT])
     return [(1 - float(sumU) / len(findShildCnt)) * 100, float(sumT) / len(findShildCnt) * 100]
