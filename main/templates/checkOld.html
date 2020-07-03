@@ -1,0 +1,71 @@
+{% extends "nonMainBase.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Проверить статью{% endblock %}
+
+{% block nav %}
+<li>
+    <a href="/" class="nav-link">Главная</a>
+</li>
+<li>
+    <a href="papers" class="nav-link">Статьи</a>
+</li>
+<li>
+    <a href="personal" class="nav-link">Мои статьи</a>
+</li>
+<li>
+    <a href="check" class="nav-link active">Проверить</a>
+</li>
+<li>
+    <a href="about" class="nav-link">О проекте</a>
+</li>
+{% endblock %}
+
+{% block processText %}
+Выполняется проверка...
+{% endblock %}
+
+{% block bodyContent %}
+
+<div class="row justify-content-center check-row">
+    <div class="col-lg-8">
+        <form align="center" id="checkForm" method="POST" action="">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.name|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.text|as_crispy_field }}
+            </div>
+            <button align="center" class="btn btn-success " id="formSend">Проверить</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block script %}
+<script>
+
+$('#formSend').click(function(event){
+    showProgress();
+    $('#checkForm').submit();
+});
+
+function showProgress(){
+    $('.process').css('display','block');
+   	$('.process-text').css('display','block');
+   	$('.process-mask').css('display','block');
+}
+
+function hideProgress(){
+    $('.process').css('display','none');
+   	$('.process-text').css('display','none');
+   	$('.process-mask').css('display','none');
+}
+
+
+</script>
+{% endblock %}

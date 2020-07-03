@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import gzip
 import io
+from django.db import connection
+
 import json
 import time
 from urllib.parse import urlencode
@@ -20,7 +22,7 @@ from selenium.webdriver.common.by import By
 from checkpapers.settings import CHROMEDRIVER_PATH
 from main.forms import PaperForm
 from misc.checkPapers import checkPaper, createPaper, getShilds, SHILD_LENGTH
-from .models import Greeting, Paper
+from .models import Greeting, Paper, SeleniumSession
 from json import dumps, loads, JSONEncoder, JSONDecoder
 import pickle
 from lxml import etree
@@ -61,107 +63,75 @@ def encodeData(data):
 def loadUrls(request):
     # если post запрос
     if request.method == 'POST':
-        user_agent = "'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5)\
-                AppleWebKit/537.36 (KHTML, like Gecko) Cafari/537.36'"
         # for shild in request.session["shilds"]:
         options = webdriver.ChromeOptions()
-        # options.add_argument('headless')
-        # options.add_argument('window-size=1920x1080')
-        # options.add_argument("disable-gpu")
-        urls = []
-        driver = webdriver.Chrome(CHROMEDRIVER_PATH, options=options)
-
+        options.add_argument('headless')
+        options.add_argument('window-size=1920x1080')
+        options.add_argument("disable-gpu")
+        options.add_experimental_option("detach", True)
         url = "http://yandex.ru/search"
-        headers = {'User-Agent': user_agent, }
 
         if request.POST["state"] == "captcha":
-            # print(request.POST)
-            url = "http://yandex.ru/checkcaptcha"
-            data = {}
-            data["rep"] = str(request.POST["code"])
-            data["key"] = str(request.POST["key"])
-            data["retpath"] = str(request.POST["retpath"])
-            url_values = urlencode(data)
-            # print(url + '?' + url_values)
-            request = Request(url + '?' + url_values, None, headers)
-            response = urlopen(request)
-            data = response.read()
-            # print(str(data, 'utf-8'))
+            # for cookie in SeleniumSession._cookies:
+            #     driver.add_cookie(cookie)
+            input = SeleniumSession._driver.find_element_by_xpath("/html/body/div/form/div[3]/div[1]/input")
+            input.send_keys(request.POST["code"])
+            submit = SeleniumSession._driver.find_element_by_xpath("/html/body/div/form/button")
+            submit.click()
+            # SeleniumSession._driver.quit()
         else:
-            urls = set()
-            for shild in request.session["shilds"]:
-                print(shild)
-                query = urlencode({'text': '"' + shild + '"'})
-                # print(url + query)
-                # request = Request(url + '?' + query, None, headers)
-                driver.get(url + '?' + query)
-                captchaImgs = driver.find_elements_by_xpath("//div[@class='captcha__image']/img")
-                # print(captchaImgs)
-                if len(captchaImgs) > 0:
-                    key = driver.find_element_by_xpath("//*[@class='form__key']/@value")
-                    # print(key)
-                    retpath = driver.find_element_by_xpath("//*[@class='form__retpath']/@value")
-                    # print(retpath)
-                    return JsonResponse({
-                        "state": "needCaptcha",
-                        "captcha": captchaImgs[0].attrib["src"],
-                        "key": key,
-                        "retpath": retpath
-                    })
-                for link in driver.find_elements_by_xpath('//a'):
-                    strLink = str(link.get_attribute("href"))
-                    if (not "yandex" in strLink) and (not "bing" in strLink) and (not "google" in strLink) and (
-                            not "mail" in strLink) and (strLink is not None):
-                        urls.add(strLink)
-                        #print(strLink)
-            # if link.startswith('/url?q=') and not link.contains("google.com"):
-            # print(link)
-            print("ready")
-        return JsonResponse({"state": "ready"})
-    else:
-        messages.error(request, "этот метод можно вызывать только через POST запрос")
-        return HttpResponseRedirect("personal")
-
-
-def loadUrlsGoogle(request):
-    # если post запрос
-    if request.method == 'POST':
-        user_agent = "'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5)\
-                AppleWebKit/537.36 (KHTML, like Gecko) Cafari/537.36'"
-        # for shild in request.session["shilds"]:
-        url = "https://www.google.com/search"
-        headers = {'User-Agent': user_agent, }
-        options = webdriver.ChromeOptions()
-        # options.add_argument('headless')
-        # options.add_argument('window-size=1920x1080')
-        # options.add_argument("disable-gpu")
-        urls = []
-        driver = webdriver.Chrome(CHROMEDRIVER_PATH, options=options)
-        for shild in request.session["shilds"]:
+            SeleniumSession._driver = webdriver.Chrome(CHROMEDRIVER_PATH, options=options)
+        urls = set()
+        urls.update(request.session["urls"])
+        for i in range(request.session["currentShild"], len(request.session["shilds"])):
+            shild = request.session["shilds"][i]
             print(shild)
-            query = urlencode({'q': '"' + shild + '"'})
-            driver.get('http://www.google.com/search?' + query)
-            if len(driver.find_elements_by_xpath("//a[@href]")) == 0:
-                print("+++++++++++++++++++++ERROR+++++++++++++++++++++++++")
-                print(driver.page_source)
-                return JsonResponse({"state": "needCaptcha"})
-
-            for link in driver.find_elements_by_xpath("//a[@href]"):
+            query = urlencode({'text': '"' + shild + '"'})
+            # print(url + query)
+            # request = Request(url + '?' + query, None, headers)
+            SeleniumSession._driver.get(url + '?' + query)
+            captchaImgs = SeleniumSession._driver.find_elements_by_xpath("//div[@class='captcha__image']/img")
+            # print(captchaImgs)
+            if len(captchaImgs) > 0:
+                request.session["urls"] = list(urls)
+                return JsonResponse({
+                    "state": "needCaptcha",
+                    "captcha": captchaImgs[0].get_attribute("src"),
+                    "url": SeleniumSession._driver.current_url
+                })
+            for link in SeleniumSession._driver.find_elements_by_xpath('//a'):
                 strLink = str(link.get_attribute("href"))
-                if strLink == "http://www.google.ru/policies/terms/":
-                    return JsonResponse({"state": "needCaptcha"})
-                if (not "www.google.com" in strLink) and (not "www.google.ru" in strLink) and (
-                        not "maps.google.com" in strLink) and (
-                        not "support.google.com" in strLink) and (not "policies.google.com" in strLink):
-                    urls.append(link.get_attribute('href'))
-
+                if (not "yandex" in strLink) and (not "bing" in strLink) and (not "google" in strLink) and (
+                        not "mail" in strLink) and (strLink is not None):
+                    urls.add(strLink)
+            request.session["currentShild"] = request.session["currentShild"] + 1
+            # print(strLink)
+        # if link.startswith('/url?q=') and not link.contains("google.com"):
+        # print(link)
         print("ready")
-        print(urls)
-        checkPaper(request.session["shilds"], urls)
+        request.session["urls"] = list(urls)
+        SeleniumSession._driver.quit()
         return JsonResponse({"state": "ready"})
     else:
         messages.error(request, "этот метод можно вызывать только через POST запрос")
         return HttpResponseRedirect("personal")
+
+
+def processUrls(request):
+    [u, t] = checkPaper(request.session["shilds"], request.session["urls"])
+    # из-за долгого времени ожидания соединение обрывается
+    # нужно его перезапускать
+    connection.connect()
+    Paper.objects.create(
+        name=request.session["name"],
+        author=request.user,
+        text=request.session["text"],
+        uniquenessPercent=u,
+        truth=t
+    )
+    messages.info(request, "Уникальность текста: " + f"{u:.{1}f}%".format(
+        u) + ", правдивость: " + f"{t:.{1}f}%".format(t))
+    return HttpResponseRedirect("/personal")
 
 
 # Create your views here.
@@ -191,7 +161,7 @@ def check(request):
             else:
                 request.session["urls"] = []
                 request.session["shilds"] = getShilds(form.cleaned_data["text"], SHILD_LENGTH)
-                request.session["currentShild"] = ""
+                request.session["currentShild"] = 0
                 request.session["text"] = form.cleaned_data["text"]
                 request.session["name"] = form.cleaned_data["name"]
                 return JsonResponse({"state": "readyToLoad"})
@@ -274,7 +244,7 @@ def personalFirsPage(request):
 def personal(request, page):
     # return HttpResponse('Hello from Python!')
     if request.user.is_authenticated:
-        paginator = Paginator(Paper.objects.all().filter(author=request.user), 12)
+        paginator = Paginator(Paper.objects.all().filter(author=request.user).order_by('pk'), 12)
         try:
             papers = paginator.page(page)
         except PageNotAnInteger:
@@ -300,7 +270,7 @@ def papersFirsPage(request):
 def papers(request, page):
     # return HttpResponse('Hello from Python!')
     if request.user.is_authenticated:
-        paginator = Paginator(Paper.objects.all(), 12)
+        paginator = Paginator(Paper.objects.all().order_by('pk'), 12)
         try:
             papers = paginator.page(page)
         except PageNotAnInteger:

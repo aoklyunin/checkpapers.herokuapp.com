@@ -16,3 +16,8 @@ class Paper(models.Model):
     uniquenessPercent = models.FloatField(default=-1)
     truth = models.FloatField(default=-1)
     name = UnlimitedCharField(default="")
+
+
+class SeleniumSession(models.Model):
+    _driver = ""
+    name = models.CharField(max_length=100)

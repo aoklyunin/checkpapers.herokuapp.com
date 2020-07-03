@@ -18,9 +18,9 @@ urlpatterns = [
     path("papers", main.views.papersFirsPage, name="papersFirsPage"),
     path("readpaper/<int:paper_id>", main.views.readPaper, name="readPaper"),
     path("papers/<int:page>", main.views.papers, name="papers"),
-    path("loadUrlsGoogle", main.views.loadUrlsGoogle, name="loadUrlsYandex"),
-    path("loadurls", main.views.loadUrls, name="loadUrls"),
     path("needlogin", main.views.needLogin, name="needlogin"),
+    path("loadurls", main.views.loadUrls, name="loadUrls"),
+    path("processurls", main.views.processUrls, name="processUrls"),
     path("deletepaper/<int:paper_id>", main.views.deletePaper, name="deletepaper"),
     path("admin/", admin.site.urls),
 ]

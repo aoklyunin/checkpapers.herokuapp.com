@@ -118,4 +118,6 @@ STATIC_URL = "/static/"
 
 django_heroku.settings(locals())
 
-CHROMEDRIVER_PATH = 'D:/Programming/chromedriver/chromedriver.exe'
+#CHROMEDRIVER_PATH = 'D:/Programming/chromedriver/chromedriver.exe'
+
+CHROMEDRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
