@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import gzip
 import io
+import os
+
 from django.db import connection
 
 import json
@@ -64,13 +66,6 @@ def loadUrls(request):
     # если post запрос
     if request.method == 'POST':
         # for shild in request.session["shilds"]:
-        options = webdriver.ChromeOptions()
-        options.add_argument('headless')
-        options.add_argument('window-size=1920x1080')
-        options.add_argument("disable-gpu")
-        options.add_experimental_option("detach", True)
-        url = "http://yandex.ru/search"
-
         if request.POST["state"] == "captcha":
             # for cookie in SeleniumSession._cookies:
             #     driver.add_cookie(cookie)
@@ -80,7 +75,13 @@ def loadUrls(request):
             submit.click()
             # SeleniumSession._driver.quit()
         else:
-            SeleniumSession._driver = webdriver.Chrome(CHROMEDRIVER_PATH, options=options)
+            options = webdriver.ChromeOptions()
+            options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+            options.add_argument('headless')
+            options.add_argument('window-size=1920x1080')
+            options.add_argument("disable-gpu")
+            options.add_experimental_option("detach", True)
+            SeleniumSession._driver = webdriver.Chrome(str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
         urls = set()
         urls.update(request.session["urls"])
         for i in range(request.session["currentShild"], len(request.session["shilds"])):
@@ -89,6 +90,7 @@ def loadUrls(request):
             query = urlencode({'text': '"' + shild + '"'})
             # print(url + query)
             # request = Request(url + '?' + query, None, headers)
+            url = "http://yandex.ru/search"
             SeleniumSession._driver.get(url + '?' + query)
             captchaImgs = SeleniumSession._driver.find_elements_by_xpath("//div[@class='captcha__image']/img")
             # print(captchaImgs)
