@@ -6,3 +6,4 @@ django-crispy-forms
 numpy
 wikipedia
 yandex-search
+selenium

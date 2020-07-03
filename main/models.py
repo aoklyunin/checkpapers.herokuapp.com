@@ -20,4 +20,3 @@ class Paper(models.Model):
 
 class SeleniumSession(models.Model):
     _driver = ""
-    name = models.CharField(max_length=100)
