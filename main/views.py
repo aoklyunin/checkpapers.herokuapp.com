@@ -62,6 +62,7 @@ def load_urls(request):
             captcha_imgs = driver.find_elements_by_xpath("//div[@class='captcha__image']/img")
             # print(captchaImgs)
             if len(captcha_imgs) > 0:
+                print("get captcha")
                 request.session["urls"] = list(urls)
                 # request.session["session_id"] = driver.session_id
                 request.session["cookies"] = driver.get_cookies()
@@ -78,6 +79,7 @@ def load_urls(request):
                     "key": key,
                     "retpath": retpath,
                 })
+            print("load links")
             for link in driver.find_elements_by_xpath('//a'):
                 str_link = str(link.get_attribute("href"))
                 if (not "yandex" in str_link) and (not "bing" in str_link) and (not "google" in str_link) and (
