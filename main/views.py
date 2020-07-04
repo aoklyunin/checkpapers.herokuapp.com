@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
+import time
+
 from django.db import connection
 from urllib.parse import urlencode
 from django.contrib import messages
@@ -34,10 +36,11 @@ def load_urls(request):
         if request.POST["state"] == "captcha":
             # переходим на по сохранённому адресу страницы с капчей
             driver.get(request.POST["url"])
+            time.sleep(0.5)
             # восстанавливаем куки
             print("cookies:")
             for cookie in request.session["cookies"]:
-                print(" "+str(cookie))
+                print(" " + str(cookie))
                 driver.add_cookie(cookie)
             # подменяем значения скрытых полей(яндекс при каждой загрузке даёт новую капчу)
             key_elem = driver.find_element_by_xpath("//*[@class='form__key']")
