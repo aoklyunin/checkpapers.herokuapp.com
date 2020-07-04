@@ -23,7 +23,7 @@ def load_urls(request):
     if request.method == 'POST':
         # опции веб-драйвера
         options = webdriver.ChromeOptions()
-        #options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+        options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
         options.add_argument('headless')
         options.add_argument("disable-gpu")
         options.add_argument('no-sandbox')
