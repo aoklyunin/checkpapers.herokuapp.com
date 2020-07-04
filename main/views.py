@@ -7,11 +7,11 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from selenium import webdriver
 from main.forms import PaperForm
 from misc.check_papers import check_paper, get_shilds
-from .models import Paper
+from .models import Paper, AddPaperConf, ShildToProcess, UrlToProcess
 
 
 # главная страница
@@ -33,13 +33,17 @@ def load_urls(request):
         options.add_argument('disable-dev-shm-usage')
         # создаём драйвер
         driver = webdriver.Chrome(str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
+
+        flg_get_captcha = False
+
         # если нужно ввести капчу
         if request.POST["state"] == "captcha":
+            flg_get_captcha = True
             # переходим на по сохранённому адресу страницы с капчей
             driver.get(request.POST["url"])
             time.sleep(0.5)
             # восстанавливаем куки
-            for cookie in request.session["cookies"]:
+            for cookie in request.session["driver-cookies"]:
                 driver.add_cookie(cookie)
             # подменяем значения скрытых полей(яндекс при каждой загрузке даёт новую капчу)
             key_elem = driver.find_element_by_xpath("//*[@class='form__key']")
@@ -55,22 +59,26 @@ def load_urls(request):
         # множество ссылок
         urls = set()
         # добавляем в него список всех уже сохранённых ссылок
-        urls.update(request.session["urls"])
+        urls.update([url_to_process.value for url_to_process in UrlToProcess.objects.all()])
+
         # перебираем необработанные шилды(начинаются с номера currentShild)
-        for i in range(request.session["currentShild"], len(request.session["shilds"])):
-            # загуржаем страницу поиска по шилду
-            shild = request.session["shilds"][i]
-            query = urlencode({'text': '"' + shild + '"'})
-            url = "http://yandex.ru/search"
-            driver.get(url + '?' + query)
+        shilds = [
+            {"value": shild.value, "pk": shild.pk} for shild in ShildToProcess.objects.all().filter(to_delete=True)
+        ]
+        for shild in shilds:
+            if not flg_get_captcha:
+                query = urlencode({'text': '"' + shild["value"] + '"'})
+                url = "http://yandex.ru/search"
+                driver.get(url + '?' + query)
             # ищем картинку с капчей
             captcha_imgs = driver.find_elements_by_xpath("//div[@class='captcha__image']/img")
             # если нашли картинку
             if len(captcha_imgs) > 0:
                 # сохраняем уже обработанные ссылки
-                request.session["urls"] = list(urls)
+                UrlToProcess.objects.all().delete()
+                UrlToProcess.objects.bulk_create([UrlToProcess(**{'value': m}) for m in urls])
                 # сохраняем куки
-                request.session["cookies"] = driver.get_cookies()
+                request.session["driver-cookies"] = driver.get_cookies()
                 # получаем параметры капчи
                 captcha = captcha_imgs[0].get_attribute("src")
                 key = driver.find_element_by_xpath("//*[@class='form__key']").get_attribute("value")
@@ -90,10 +98,10 @@ def load_urls(request):
                 if (not "yandex" in str_link) and (not "bing" in str_link) and (not "google" in str_link) and (
                         not "mail" in str_link) and (str_link is not None):
                     urls.add(str_link)
-            # увеличиваем номер текущего шилда на 1
-            request.session["currentShild"] = request.session["currentShild"] + 1
+            ShildToProcess.objects.get(pk=shild["pk"]).delete()
         # сохраняем уже обработанные ссылки
-        request.session["urls"] = list(urls)
+        UrlToProcess.objects.all().delete()
+        UrlToProcess.objects.bulk_create([UrlToProcess(**{'value': m}) for m in urls])
         return JsonResponse({"state": "ready"})
     else:
         messages.error(request, "этот метод можно вызывать только через POST запрос")
@@ -102,23 +110,29 @@ def load_urls(request):
 
 # обработка загруженных ссылок
 def process_urls(request):
-    [u, t] = check_paper(request.session["shilds"], request.session["urls"])
-    # на всякий случай очищаем переменные сессии
-    request.session["urls"] = []
-    request.session["shilds"] = []
+    [u, t] = check_paper(
+        [shild.value for shild in ShildToProcess.objects.all().filter(to_delete=False)],
+        [url_to_process.value for url_to_process in UrlToProcess.objects.all()]
+    )
     # из-за долгого времени ожидания соединение обрывается
     # нужно его перезапускать
     connection.connect()
+    # очищаем списки
+    ShildToProcess.objects.all().delete()
+    UrlToProcess.objects.all().delete()
+    add_paper_conf = AddPaperConf.objects.all().first()
     # создаём запись о статье
     Paper.objects.create(
-        name=request.session["name"],
+        name=add_paper_conf.name,
         author=request.user,
-        text=request.session["text"],
+        text=add_paper_conf.text,
         uniquenessPercent=u,
         truth=t
     )
-    messages.info(request, "Уникальность текста: " + f"{u:.{1}f}%".format(
-        u) + ", правдивость: " + f"{t:.{1}f}%".format(t))
+    # очищаем параметры добаления статьи
+    AddPaperConf.objects.all().delete()
+    messages.info(request, "Оригинальность текста: " + f"{u:.{1}f}%".format(
+        u) + ", правдоподобность: " + f"{t:.{1}f}%".format(t))
     return HttpResponseRedirect("/personal")
 
 
@@ -149,11 +163,17 @@ def check(request):
                 if len(shilds) == 0:
                     messages.error(request, "Статья содержит слдишком мало слов")
                     return JsonResponse({"state": "formError"})
-                request.session["urls"] = []
-                request.session["shilds"] = shilds
-                request.session["currentShild"] = 0
-                request.session["text"] = form.cleaned_data["text"]
-                request.session["name"] = form.cleaned_data["name"]
+                # на всякий случай удаляем все параметры
+                AddPaperConf.objects.all().delete()
+                # создаём параметры добавления статьи
+                AddPaperConf.objects.create(
+                    text=form.cleaned_data["text"],
+                    name=form.cleaned_data["name"]
+                )
+                ShildToProcess.objects.all().delete()
+                UrlToProcess.objects.all().delete()
+                ShildToProcess.objects.bulk_create([ShildToProcess(**{'value': m, 'to_delete': False}) for m in shilds])
+                ShildToProcess.objects.bulk_create([ShildToProcess(**{'value': m, 'to_delete': True}) for m in shilds])
                 return JsonResponse({"state": "readyToLoad"})
         else:
             # перезагружаем страницу

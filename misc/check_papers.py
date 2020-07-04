@@ -83,7 +83,7 @@ def check_paper(current_paper_shilds, url_list):
             else:
                 # загружаем видимый текст со страницы
                 req = Request(url, headers={'User-Agent': "Magic Browser"})
-                text = text_from_html(urlopen(req, timeout=1).read())
+                text = text_from_html(urlopen(req, timeout=3).read())
             # перебираем шилды текста с которым сравниваем
             for foundedShild in get_shilds(text):
                 # если в проверяемой статье есть такой шилд, то увеличиваем

@@ -16,3 +16,25 @@ class Paper(models.Model):
     uniquenessPercent = models.FloatField(default=-1)
     # правдивость статьи
     truth = models.FloatField(default=-1)
+
+
+# параметры статьи при добавлении
+class AddPaperConf(models.Model):
+    # текст
+    text = UnlimitedCharField(default="")
+    # название статьи
+    name = UnlimitedCharField(default="")
+
+
+# URL для добавления
+class UrlToProcess(models.Model):
+    # значение
+    value = UnlimitedCharField(default="")
+
+
+# шилд для добавления
+class ShildToProcess(models.Model):
+    # значение
+    value = UnlimitedCharField(default="")
+    # флаг, нужно ли удалять во время поиска ссылок
+    to_delete = models.BooleanField(default=False)
