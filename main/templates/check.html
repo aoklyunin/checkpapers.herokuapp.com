@@ -74,6 +74,12 @@
                     <input id="form-url" type="hidden" name="url"
                            value=""/>
 
+                    <input id="form-retpath" type="hidden" name="retpath"
+                           value=""/>
+
+                    <input id="form-key" type="hidden" name="key"
+                           value=""/>
+
 
                 </form>
             </div>
@@ -85,12 +91,14 @@
 
 {% block script %}
 <script>
-   function submitform(f) {
-   	    $('.process').css('display','block');
-   	    $('.process-text').css('display','block');
-   	    $('.process-mask').css('display','block');
-        f.submit();
-   }
+
+//function submitform(f) {
+//   	    $('.process').css('display','block');
+//   	    $('.process-text').css('display','block');
+//   	    $('.process-mask').css('display','block');
+//        f.submit();
+//}
+
 $.ajaxSetup({
      beforeSend: function(xhr, settings) {
          function getCookie(name) {
@@ -122,6 +130,8 @@ $('#captcha-form__submit').click(function(){
         {
             "state":"captcha",
             "code": $("#captcha-form__text").val(),
+            "retpath":   $("#form-retpath").val(),
+            "key":   $("#form-key").val(),
             "url":   $("#form-url").val()
         },
         function(msg){
@@ -163,23 +173,12 @@ $('#checkForm').submit(function(){
 
 function setCaptcha(msg){
   $("#captcha-img").attr("src",msg["captcha"]),
-                        $("#captcha-form__text").val(""),
-                        $("#form-url").val(msg["url"]),
+  $("#captcha-form__text").val(""),
+  $("#form-url").val(msg["url"]),
+  $("#form-key").val(msg["key"]),
+  $("#form-retpath").val(msg["retpath"]),
   $("#captcha-form-modal").modal('show');
 }
-
-function showProgress(){
-    $('.process').css('display','block');
-   	$('.process-text').css('display','block');
-   	$('.process-mask').css('display','block');
-}
-
-function hideProgress(){
-    $('.process').css('display','none');
-   	$('.process-text').css('display','none');
-   	$('.process-mask').css('display','none');
-}
-
 
 </script>
 {% endblock %}

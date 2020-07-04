@@ -21,7 +21,6 @@ from django.contrib.auth import login as auth_login
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-from checkpapers.settings import CHROMEDRIVER_PATH
 from main.forms import PaperForm
 from misc.checkPapers import checkPaper, createPaper, getShilds, SHILD_LENGTH
 from .models import Greeting, Paper
@@ -65,24 +64,31 @@ def encodeData(data):
 def loadUrls(request):
     # если post запрос
     if request.method == 'POST':
-        # for shild in request.session["shilds"]:
+        options = webdriver.ChromeOptions()
+        # options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+        # options.add_argument('headless')
+        # options.add_argument("disable-gpu")
+        # options.add_argument('no-sandbox')
+        # options.add_argument('disable-dev-shm-usage')
+        # options.add_experimental_option("detach", True)
+        driver = webdriver.Chrome(str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
+
         if request.POST["state"] == "captcha":
-            # for cookie in SeleniumSession._cookies:
-            #     driver.add_cookie(cookie)
-            input = request.session["driver"].find_element_by_xpath("/html/body/div/form/div[3]/div[1]/input")
+            driver.get(request.POST["url"])
+            for cookie in request.session["cookies"]:
+                print(cookie)
+                driver.add_cookie(cookie)
+
+            keyElem = driver.find_element_by_xpath("//*[@class='form__key']")
+            driver.execute_script("arguments[0].value = '" + request.POST["key"] + "';", keyElem)
+            keyRetPath = driver.find_element_by_xpath("//*[@class='form__retpath']")
+            driver.execute_script("arguments[0].value = '" + request.POST["retpath"] + "';", keyRetPath)
+
+            input = driver.find_element_by_xpath("/html/body/div/form/div[3]/div[1]/input")
             input.send_keys(request.POST["code"])
-            submit = request.session["driver"].find_element_by_xpath("/html/body/div/form/button")
+            submit = driver.find_element_by_xpath("/html/body/div/form/button")
             submit.click()
-            # SeleniumSession._driver.quit()
-        else:
-            options = webdriver.ChromeOptions()
-            options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
-            options.add_argument('headless')
-            options.add_argument("disable-gpu")
-            options.add_argument('no-sandbox')
-            options.add_argument('disable-dev-shm-usage')
-            options.add_experimental_option("detach", True)
-            request.session["driver"] = webdriver.Chrome(str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
+
         urls = set()
         urls.update(request.session["urls"])
         for i in range(request.session["currentShild"], len(request.session["shilds"])):
@@ -92,17 +98,27 @@ def loadUrls(request):
             # print(url + query)
             # request = Request(url + '?' + query, None, headers)
             url = "http://yandex.ru/search"
-            request.session["driver"].get(url + '?' + query)
-            captchaImgs = request.session["driver"].find_elements_by_xpath("//div[@class='captcha__image']/img")
+            driver.get(url + '?' + query)
+            captchaImgs = driver.find_elements_by_xpath("//div[@class='captcha__image']/img")
             # print(captchaImgs)
             if len(captchaImgs) > 0:
                 request.session["urls"] = list(urls)
+                # request.session["session_id"] = driver.session_id
+                request.session["cookies"] = driver.get_cookies()
+                captcha = captchaImgs[0].get_attribute("src")
+                key = driver.find_element_by_xpath("//*[@class='form__key']").get_attribute("value")
+                # print(key)
+                retpath = driver.find_element_by_xpath("//*[@class='form__retpath']").get_attribute("value")
+                driverUrl = driver.current_url
+                driver.close()
                 return JsonResponse({
                     "state": "needCaptcha",
-                    "captcha": captchaImgs[0].get_attribute("src"),
-                    "url": request.session["driver"].current_url
+                    "captcha": captcha,
+                    "url": driverUrl,
+                    "key": key,
+                    "retpath": retpath,
                 })
-            for link in request.session["driver"].find_elements_by_xpath('//a'):
+            for link in driver.find_elements_by_xpath('//a'):
                 strLink = str(link.get_attribute("href"))
                 if (not "yandex" in strLink) and (not "bing" in strLink) and (not "google" in strLink) and (
                         not "mail" in strLink) and (strLink is not None):
@@ -113,7 +129,6 @@ def loadUrls(request):
         # print(link)
         print("ready")
         request.session["urls"] = list(urls)
-        request.session["driver"].quit()
         return JsonResponse({"state": "ready"})
     else:
         messages.error(request, "этот метод можно вызывать только через POST запрос")

@@ -14,7 +14,6 @@ from selenium import webdriver
 from wikipedia import wikipedia
 from django.db import connection
 
-from checkpapers.settings import CHROMEDRIVER_PATH
 from main.models import Paper
 
 SHILD_LENGTH = 5
@@ -94,7 +93,7 @@ def loadUrls(shilds):
     # options.add_argument('headless')
     # options.add_argument('window-size=1920x1080')
     # options.add_argument("disable-gpu")
-    driver = webdriver.Chrome(CHROMEDRIVER_PATH, options=options)
+    driver = webdriver.Chrome(str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
 
     url = "http://yandex.ru/search"
 

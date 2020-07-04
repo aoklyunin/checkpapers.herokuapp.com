@@ -140,6 +140,21 @@
 <!-- jQuery Scripts -->
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script src="{% static 'js/scripts.min.js' %}"></script>
+<script>
+
+function showProgress(){
+    $('.process').css('display','block');
+   	$('.process-text').css('display','block');
+   	$('.process-mask').css('display','block');
+}
+
+function hideProgress(){
+    $('.process').css('display','none');
+   	$('.process-text').css('display','none');
+   	$('.process-mask').css('display','none');
+}
+
+</script>
 {%block script%}
 
 {%endblock %}
