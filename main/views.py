@@ -26,7 +26,7 @@ def load_urls(request):
         # опции веб-драйвера
         options = webdriver.ChromeOptions()
         # эта опция используется только для деплоя на heroku
-        #options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+        # options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
         options.add_argument('headless')
         options.add_argument("disable-gpu")
         options.add_argument('no-sandbox')
@@ -204,23 +204,20 @@ def papers_first_page(request):
 
 # раздел "Cтатьи"
 def papers(request, page):
-    if request.user.is_authenticated:
-        paginator = Paginator(Paper.objects.all().order_by('pk'), 12)
-        try:
-            papers = paginator.page(page)
-        except PageNotAnInteger:
-            papers = paginator.page(1)
-        except EmptyPage:
-            papers = paginator.page(paginator.num_pages)
+    paginator = Paginator(Paper.objects.all().order_by('pk'), 12)
+    try:
+        papers = paginator.page(page)
+    except PageNotAnInteger:
+        papers = paginator.page(1)
+    except EmptyPage:
+        papers = paginator.page(paginator.num_pages)
 
-        return render(request, "papers.html", {
-            "papers": papers,
-            "paperCount": len(papers),
-            "flgAllPapers": True,
-            "page": page
-        })
-    else:
-        return HttpResponseRedirect("/need_login")
+    return render(request, "papers.html", {
+        "papers": papers,
+        "paperCount": len(papers),
+        "flgAllPapers": True,
+        "page": page
+    })
 
 
 # удалить статью
