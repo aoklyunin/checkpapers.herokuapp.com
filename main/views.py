@@ -25,7 +25,7 @@ def load_urls(request):
     if request.method == 'POST':
         # опции веб-драйвера
         options = webdriver.ChromeOptions()
-        options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+        #options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
         options.add_argument('headless')
         options.add_argument("disable-gpu")
         options.add_argument('no-sandbox')
@@ -38,9 +38,7 @@ def load_urls(request):
             driver.get(request.POST["url"])
             time.sleep(0.5)
             # восстанавливаем куки
-            print("cookies:")
             for cookie in request.session["cookies"]:
-                print(" " + str(cookie))
                 driver.add_cookie(cookie)
             # подменяем значения скрытых полей(яндекс при каждой загрузке даёт новую капчу)
             key_elem = driver.find_element_by_xpath("//*[@class='form__key']")
@@ -59,20 +57,22 @@ def load_urls(request):
         urls.update(request.session["urls"])
         # перебираем необработанные шилды(начинаются с номера currentShild)
         for i in range(request.session["currentShild"], len(request.session["shilds"])):
+            # загуржаем страницу поиска по шилду
             shild = request.session["shilds"][i]
             query = urlencode({'text': '"' + shild + '"'})
             url = "http://yandex.ru/search"
             driver.get(url + '?' + query)
+            # ищем картинку с капчей
             captcha_imgs = driver.find_elements_by_xpath("//div[@class='captcha__image']/img")
-            # print(captchaImgs)
+            # если нашли картинку
             if len(captcha_imgs) > 0:
-                print("get captcha")
+                # сохраняем уже обработанные ссылки
                 request.session["urls"] = list(urls)
-                # request.session["session_id"] = driver.session_id
+                # сохраняем куки
                 request.session["cookies"] = driver.get_cookies()
+                # получаем параметры капчи
                 captcha = captcha_imgs[0].get_attribute("src")
                 key = driver.find_element_by_xpath("//*[@class='form__key']").get_attribute("value")
-                # print(key)
                 retpath = driver.find_element_by_xpath("//*[@class='form__retpath']").get_attribute("value")
                 driver_url = driver.current_url
                 return JsonResponse({
@@ -82,17 +82,16 @@ def load_urls(request):
                     "key": key,
                     "retpath": retpath,
                 })
-            print("load links")
+            # перебираем все ссылки на странице
             for link in driver.find_elements_by_xpath('//a'):
+                # добавляем только те, которые ссылаются не на яндекс
                 str_link = str(link.get_attribute("href"))
                 if (not "yandex" in str_link) and (not "bing" in str_link) and (not "google" in str_link) and (
                         not "mail" in str_link) and (str_link is not None):
                     urls.add(str_link)
+            # увеличиваем номер текущего шилда на 1
             request.session["currentShild"] = request.session["currentShild"] + 1
-            # print(strLink)
-        # if link.startswith('/url?q=') and not link.contains("google.com"):
-        # print(link)
-        print("ready")
+        # сохраняем уже обработанные ссылки
         request.session["urls"] = list(urls)
         return JsonResponse({"state": "ready"})
     else:
@@ -100,14 +99,16 @@ def load_urls(request):
         return HttpResponseRedirect("personal")
 
 
+# обработка загруженных ссылок
 def process_urls(request):
-    print("process_urls")
     [u, t] = checkPaper(request.session["shilds"], request.session["urls"])
+    # на всякий случай очищаем переменные сессии
     request.session["urls"] = []
     request.session["shilds"] = []
     # из-за долгого времени ожидания соединение обрывается
     # нужно его перезапускать
     connection.connect()
+    # создаём запись о статье
     Paper.objects.create(
         name=request.session["name"],
         author=request.user,
@@ -120,9 +121,8 @@ def process_urls(request):
     return HttpResponseRedirect("/personal")
 
 
-# Create your views here.
+# проверка статьи
 def check(request):
-    # return HttpResponse('Hello from Python!')
     if not request.user.is_authenticated:
         return HttpResponseRedirect("/need_login")
 
@@ -132,33 +132,31 @@ def check(request):
         form = PaperForm(request.POST)
         # если форма заполнена корректно
         if form.is_valid():
-            data = {
-                'text': form.cleaned_data["text"],
-                'name': form.cleaned_data["name"],
-            }
-            # проверяем, что пароли совпадают
+            # проверяем, что у статьи есть текст
             if form.cleaned_data["text"] == "":
                 # выводим сообщение и перезаполняем форму
                 messages.error(request, "Вы послали на проверку статью без текста")
-                # проверяем, что пароли совпадают
+                return HttpResponseRedirect("check")
+            # проверяем, что у статьи есть название
             elif form.cleaned_data["name"] == "":
                 # выводим сообщение и перезаполняем форму
-                messages.error(request, "Вы послали на проверку статью без текста")
+                messages.error(request, "Вы послали на проверку статью без названия")
+                return HttpResponseRedirect("check")
+            # проверяем, что у в статье достаточное кол-во слов
             else:
+                shilds = getShilds(form.cleaned_data["text"], SHILD_LENGTH)
+                if len(shilds) == 0:
+                    messages.error(request, "Статья содержит слдишком мало слов")
+                    return JsonResponse({"state": "formError"})
                 request.session["urls"] = []
-                request.session["shilds"] = getShilds(form.cleaned_data["text"], SHILD_LENGTH)
+                request.session["shilds"] = shilds
                 request.session["currentShild"] = 0
                 request.session["text"] = form.cleaned_data["text"]
                 request.session["name"] = form.cleaned_data["name"]
                 return JsonResponse({"state": "readyToLoad"})
-            # перерисовываем окно
-            return render(request, "check.html", {
-                'form': PaperForm(initial=data),
-            })
         else:
             # перезагружаем страницу
             messages.error(request, "Неправильно заполнена форма")
-
             return HttpResponseRedirect("check")
     else:
         # возвращаем простое окно регистрации
@@ -167,19 +165,18 @@ def check(request):
         })
 
 
-# Create your views here.
+# страница "О проекте"
 def about(request):
-    # return HttpResponse('Hello from Python!')
     return render(request, "about.html")
 
 
+# первая страница раздела "Мои статьи"
 def personal_firs_page(request):
     return personal(request, 1)
 
 
-# Create your views here.
+# раздел "Мои статьи"
 def personal(request, page):
-    # return HttpResponse('Hello from Python!')
     if request.user.is_authenticated:
         paginator = Paginator(Paper.objects.all().filter(author=request.user).order_by('pk'), 12)
         try:
@@ -199,13 +196,13 @@ def personal(request, page):
         return HttpResponseRedirect("/need_login")
 
 
+# первая страница раздела "Cтатьи"
 def papers_first_page(request):
     return papers(request, 1)
 
 
-# Create your views here.
+# раздел "Cтатьи"
 def papers(request, page):
-    # return HttpResponse('Hello from Python!')
     if request.user.is_authenticated:
         paginator = Paginator(Paper.objects.all().order_by('pk'), 12)
         try:
@@ -225,6 +222,7 @@ def papers(request, page):
         return HttpResponseRedirect("/need_login")
 
 
+# удалить статью
 def delete_paper(request, paper_id):
     # return HttpResponse('Hello from Python!')
     if not request.user.is_authenticated:
@@ -243,12 +241,14 @@ def delete_paper(request, paper_id):
     return HttpResponseRedirect("/personal")
 
 
+# страница с предупреждением о необходимости авторизации
 def need_login(request):
     # return HttpResponse('Hello from Python!')
     return render(request, "need_login.html")
 
 
-def readPaper(request, paper_id):
+# страница с отображением выбранной статьи
+def read_paper(request, paper_id):
     try:
         paper = Paper.objects.get(pk=paper_id)
         return render(request, "read_paper.html", {

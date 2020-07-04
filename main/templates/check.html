@@ -129,7 +129,11 @@ $('#checkForm').submit(function(){
         '',
         $("#checkForm").serialize(),
         function(msg) { // получен ответ сервера
-            load({ "state":"load"  });
+            if (msg["state"]=="formError"){
+                window.location ='/check';
+            }else{
+                load({ "state":"load"  });
+            }
         }
     );
     return false;
