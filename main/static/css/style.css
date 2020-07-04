@@ -1043,7 +1043,7 @@ a.close.disabled {
 	overflow: hidden; }
 
 .modal-open .modal {
-	overflow-x: hidden;
+	overflow-x: auto;
 	overflow-y: auto; }
 
 .modal {
@@ -1202,28 +1202,6 @@ a.close.disabled {
 	height: 50px;
 	overflow: scroll; }
 
-@media (min-width: 576px) {
-	.modal-dialog {
-		max-width: 500px;
-		margin: 1.75rem auto; }
-	.modal-dialog-scrollable {
-		max-height: calc(100% - 3.5rem); }
-	.modal-dialog-scrollable .modal-content {
-		max-height: calc(100vh - 3.5rem); }
-	.modal-dialog-centered {
-		min-height: calc(100% - 3.5rem); }
-	.modal-dialog-centered:before {
-		height: calc(100vh - 3.5rem); }
-	.modal-sm {
-		max-width: 300px; } }
-
-@media (min-width: 992px) {
-	.modal-lg, .modal-xl {
-		max-width: 800px; } }
-
-@media (min-width: 1200px) {
-	.modal-xl {
-		max-width: 1140px; } }
 
 .d-none {
 	display: none !important; }

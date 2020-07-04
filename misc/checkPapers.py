@@ -2,6 +2,7 @@
 """
     Возвращает процент уникальности в заданной статье
 """
+import os
 import re
 import time
 from urllib.parse import urlencode
@@ -17,6 +18,7 @@ from django.db import connection
 from main.models import Paper
 
 SHILD_LENGTH = 5
+
 
 def tag_visible(element):
     if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]']:
@@ -61,7 +63,7 @@ def checkPaper(currentPaperShilds, urlList):
                 # print(">"+text)
             else:
                 req = Request(url, headers={'User-Agent': "Magic Browser"})
-                text = text_from_html(urlopen(req).read())
+                text = text_from_html(urlopen(req, timeout=1).read())
 
             for foundedShild in getShilds(text, SHILD_LENGTH):
                 if foundedShild in currentPaperShilds:
@@ -84,8 +86,6 @@ def checkPaper(currentPaperShilds, urlList):
 
     print([sumU, sumT, len(findShildCnt)])
     return [(1 - float(sumU) / len(findShildCnt)) * 100, float(sumT) / len(findShildCnt) * 100]
-
-
 
 
 def loadUrls(shilds):
@@ -137,7 +137,6 @@ def createPaper(text, name, author):
         truth=t
     )
     return [u, t]
-
 
 
 def createPaperYandex(text, name, author):

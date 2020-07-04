@@ -64,6 +64,15 @@ def encodeData(data):
 def loadUrls(request):
     # если post запрос
     if request.method == 'POST':
+        # return JsonResponse({
+        #     "state": "needCaptcha",
+        #     "captcha": "",
+        #     "url":  "",
+        #     "key":  "",
+        #     "retpath":  "",
+        # })
+
+        #return JsonResponse({"state": "ready"})
         options = webdriver.ChromeOptions()
         # options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
         # options.add_argument('headless')
@@ -128,6 +137,7 @@ def loadUrls(request):
         # if link.startswith('/url?q=') and not link.contains("google.com"):
         # print(link)
         print("ready")
+        driver.close()
         request.session["urls"] = list(urls)
         return JsonResponse({"state": "ready"})
     else:
@@ -136,7 +146,10 @@ def loadUrls(request):
 
 
 def processUrls(request):
+    print("processUrls")
     [u, t] = checkPaper(request.session["shilds"], request.session["urls"])
+    request.session["urls"] = []
+    request.session["shilds"] = []
     # из-за долгого времени ожидания соединение обрывается
     # нужно его перезапускать
     connection.connect()

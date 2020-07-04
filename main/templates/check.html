@@ -45,13 +45,11 @@
 {% endblock %}
 
 {%block modalBlock%}
-<!-- Contact Form -->
-<div class="modal fade contact-form-modal" id="captcha-form-modal" role="dialog" aria-label="Contact Form Modal"
-     aria-hidden="true">
-    <div class="modal-dialog contact-form-modal__dialog" role="document">
-        <div class="modal-content contact-form-modal__content">
+<div class="modal fade" id="captcha-form-modal" >
+    <div class="modal-dialog">
+        <div class="modal-content">
 
-            <div class="row modal-body contact-form-modal__body justify-content-center">
+            <div class="row modal-body captcha-form-modal__body justify-content-center">
                 <form id="captcha-form" method="POST" align="center">
                     <div class="text-center">
                         <div class="col-lg-12">
@@ -69,8 +67,6 @@
                                value="Отправить">
                     </div>
 
-                    <div id="contact-form__message" class="contact-form__message" role="alert"></div>
-
                     <input id="form-url" type="hidden" name="url"
                            value=""/>
 
@@ -80,24 +76,16 @@
                     <input id="form-key" type="hidden" name="key"
                            value=""/>
 
-
                 </form>
             </div>
         </div>
     </div>
-</div> <!-- end contact form -->
+</div>
 {% endblock%}
 
 
 {% block script %}
 <script>
-
-//function submitform(f) {
-//   	    $('.process').css('display','block');
-//   	    $('.process-text').css('display','block');
-//   	    $('.process-mask').css('display','block');
-//        f.submit();
-//}
 
 $.ajaxSetup({
      beforeSend: function(xhr, settings) {
@@ -124,26 +112,15 @@ $.ajaxSetup({
 });
 
 $('#captcha-form__submit').click(function(){
-   showProgress();
-   $.post(
-        '/loadurls',
-        {
-            "state":"captcha",
-            "code": $("#captcha-form__text").val(),
-            "retpath":   $("#form-retpath").val(),
-            "key":   $("#form-key").val(),
-            "url":   $("#form-url").val()
-        },
-        function(msg){
-               hideProgress();
-               if (msg["state"]="needCaptcha"){
-                    setCaptcha(msg);
-               }else{
-                    window.location='/personal';
-               }
-        }
-   )
-   return false;
+    showProgress();
+    load({
+        "state":"captcha",
+        "code": $("#captcha-form__text").val(),
+        "retpath":   $("#form-retpath").val(),
+        "key":   $("#form-key").val(),
+        "url":   $("#form-url").val()
+    });
+    return false;
 });
 
 $('#checkForm').submit(function(){
@@ -152,33 +129,43 @@ $('#checkForm').submit(function(){
         '',
         $("#checkForm").serialize(),
         function(msg) { // получен ответ сервера
-            $.post(
-                '/loadurls',
-                {
-                    "state":"load"
-                },
-                function(msg){
-                    if (msg["state"]=="needCaptcha"){
-                        hideProgress();
-                        setCaptcha(msg);
-                    }else{
-                        window.location ='/processurls';
-                    }
-                }
-            )
+            load({ "state":"load"  });
         }
     );
     return false;
 });
 
-function setCaptcha(msg){
-  $("#captcha-img").attr("src",msg["captcha"]),
-  $("#captcha-form__text").val(""),
-  $("#form-url").val(msg["url"]),
-  $("#form-key").val(msg["key"]),
-  $("#form-retpath").val(msg["retpath"]),
-  $("#captcha-form-modal").modal('show');
+function load(data){
+    $.post(
+        '/loadurls',
+        data,
+        function(msg){
+            if (msg["state"]=="needCaptcha"){
+                hideProgress();
+                setCaptcha(msg);
+            }else{
+                window.location ='/processurls';
+            }
+        }
+    );
 }
+
+function setCaptcha(msg){
+    $("#captcha-img").attr("src",msg["captcha"]),
+    $("#captcha-form__text").val(""),
+    $("#form-url").val(msg["url"]),
+    $("#form-key").val(msg["key"]),
+    $("#form-retpath").val(msg["retpath"]),
+    $("#captcha-form-modal").modal('show');
+}
+
+
+$('body').on('show.bs.modal', function () {
+    $('.sticky-top').css('margin-left', '-=0px');
+});
+$('body').on('hidden.bs.modal', function () {
+    $('.sticky-top').css('margin-left', 'auto');
+});
 
 </script>
 {% endblock %}
