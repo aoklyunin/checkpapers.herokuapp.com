@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from selenium import webdriver
 from main.forms import PaperForm
-from misc.checkPapers import checkPaper, createPaper, getShilds, SHILD_LENGTH
+from misc.checkPapers import checkPaper, getShilds, SHILD_LENGTH
 from .models import Paper
 
 
@@ -35,7 +35,9 @@ def load_urls(request):
             # переходим на по сохранённому адресу страницы с капчей
             driver.get(request.POST["url"])
             # восстанавливаем куки
+            print("cookies:")
             for cookie in request.session["cookies"]:
+                print(" "+str(cookie))
                 driver.add_cookie(cookie)
             # подменяем значения скрытых полей(яндекс при каждой загрузке даёт новую капчу)
             key_elem = driver.find_element_by_xpath("//*[@class='form__key']")
