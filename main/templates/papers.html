@@ -56,23 +56,23 @@
         <table border=0 width="100%">
             {% if paperCount > 0 %}
             <tr>
-                <th align="center">
+                <td align="center">
                     <b>Текст статьи</b>
-                </th>
-                <th align="center">
+                </td>
+                <td align="center">
                     <b>Уникальность</b>
-                </th>
-                <th align="center">
+                </td>
+                <td align="center">
                     <b>Правдивость</b>
-                </th>
-                <th align="center">
+                </td>
+                <td align="center">
                     <b>{% if flgAllPapers %}
                         Автор
                         {% else %}
                         Удалить
                         {% endif %}
                     </b>
-                </th>
+                </td>
             </tr>
             {%endif%}
             {% for paper in papers %}
@@ -90,7 +90,7 @@
                 </td>
                 <td align="center">
                     {% if flgAllPapers %}
-                    {{request.user.username}}
+                    {{paper.author.username}}
                     {% else %}
                     <a href="delete_paper/{{paper.id}}">
                         <img src="{%static 'img/deleteButton.png'%}" width=15px height=15px class="deleteImg"

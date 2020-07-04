@@ -9,9 +9,11 @@
             <a class="page-link">Страница {{page.number}} из {{page.paginator.num_pages}}</a>
         </td>
         <td class="page-item">
-            {% if page.has_next %}
-            <a class="page-link" href="/{%if flgAllPapers %}papers{%else%}personal{%endif%}/{{page.next_page_number}}">Следущая</a>
-            {% endif %}
+            {% ifnotequal paperCount 0 %}
+                {% if page.has_next %}
+                <a class="page-link" href="/{%if flgAllPapers %}papers{%else%}personal{%endif%}/{{page.next_page_number}}">Следущая</a>
+                {% endif %}
+            {% endifnotequal %}
         </td>
     </tr>
 </table>

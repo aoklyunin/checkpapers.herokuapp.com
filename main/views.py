@@ -10,7 +10,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from selenium import webdriver
 from main.forms import PaperForm
-from misc.checkPapers import checkPaper, getShilds, SHILD_LENGTH
+from misc.check_papers import check_paper, get_shilds
 from .models import Paper
 
 
@@ -25,6 +25,7 @@ def load_urls(request):
     if request.method == 'POST':
         # опции веб-драйвера
         options = webdriver.ChromeOptions()
+        # эта опция используется только для деплоя на heroku
         #options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
         options.add_argument('headless')
         options.add_argument("disable-gpu")
@@ -101,7 +102,7 @@ def load_urls(request):
 
 # обработка загруженных ссылок
 def process_urls(request):
-    [u, t] = checkPaper(request.session["shilds"], request.session["urls"])
+    [u, t] = check_paper(request.session["shilds"], request.session["urls"])
     # на всякий случай очищаем переменные сессии
     request.session["urls"] = []
     request.session["shilds"] = []
@@ -144,7 +145,7 @@ def check(request):
                 return HttpResponseRedirect("check")
             # проверяем, что у в статье достаточное кол-во слов
             else:
-                shilds = getShilds(form.cleaned_data["text"], SHILD_LENGTH)
+                shilds = get_shilds(form.cleaned_data["text"])
                 if len(shilds) == 0:
                     messages.error(request, "Статья содержит слдишком мало слов")
                     return JsonResponse({"state": "formError"})
