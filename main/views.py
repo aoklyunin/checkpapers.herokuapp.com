@@ -70,7 +70,6 @@ def load_urls(request):
                 # print(key)
                 retpath = driver.find_element_by_xpath("//*[@class='form__retpath']").get_attribute("value")
                 driver_url = driver.current_url
-                driver.close()
                 return JsonResponse({
                     "state": "needCaptcha",
                     "captcha": captcha,
@@ -89,7 +88,6 @@ def load_urls(request):
         # if link.startswith('/url?q=') and not link.contains("google.com"):
         # print(link)
         print("ready")
-        driver.close()
         request.session["urls"] = list(urls)
         return JsonResponse({"state": "ready"})
     else:
