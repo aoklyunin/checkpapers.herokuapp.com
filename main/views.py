@@ -1,85 +1,33 @@
 # -*- coding: utf-8 -*-
-import gzip
-import io
 import os
-
 from django.db import connection
-
-import json
-import time
 from urllib.parse import urlencode
-from urllib.request import urlopen, Request
-
-from django.contrib import auth, messages
-from django.contrib.auth import authenticate
-from django.contrib.auth.forms import UserCreationForm
-from django.core import paginator
+from django.contrib import messages
 from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.contrib.auth import login as auth_login
+from django.shortcuts import render
+from django.http import HttpResponseRedirect, JsonResponse
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-
 from main.forms import PaperForm
 from misc.checkPapers import checkPaper, createPaper, getShilds, SHILD_LENGTH
-from .models import Greeting, Paper
-from json import dumps, loads, JSONEncoder, JSONDecoder
-import pickle
-from lxml import etree
+from .models import Paper
 
 
-class PythonObjectEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, (list, dict, str, int, float, bool, type(None))):
-            return JSONEncoder.default(self, obj)
-        return {'_python_object': pickle.dumps(obj)}
-
-
-def as_python_object(dct):
-    if '_python_object' in dct:
-        return pickle.loads(str(dct['_python_object']))
-    return dct
-
-
-# Create your views here.
+# главная страница
 def index(request):
-    # return HttpResponse('Hello from Python!')
     return render(request, "index.html")
 
 
-# Create your views here.
-def test(request):
-    # return HttpResponse('Hello from Python!')
-    return render(request, "testPage.html")
-
-
-def encodeData(data):
-    buffer = io.BytesIO(data)  # Use StringIO.StringIO(response.read()) in Python 2
-    gzipped_file = gzip.GzipFile(fileobj=buffer)
-    decoded = gzipped_file.read()
-    return decoded.decode("utf-8")  # Replace utf-8 with the source encoding of your requested resource
-
-
+# загрузить ссылки на статьи
 def loadUrls(request):
     # если post запрос
     if request.method == 'POST':
-        # return JsonResponse({
-        #     "state": "needCaptcha",
-        #     "captcha": "",
-        #     "url":  "",
-        #     "key":  "",
-        #     "retpath":  "",
-        # })
-
-        #return JsonResponse({"state": "ready"})
         options = webdriver.ChromeOptions()
-        # options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
-        # options.add_argument('headless')
-        # options.add_argument("disable-gpu")
-        # options.add_argument('no-sandbox')
-        # options.add_argument('disable-dev-shm-usage')
-        # options.add_experimental_option("detach", True)
+        options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+        options.add_argument('headless')
+        options.add_argument("disable-gpu")
+        options.add_argument('no-sandbox')
+        options.add_argument('disable-dev-shm-usage')
+        options.add_experimental_option("detach", True)
         driver = webdriver.Chrome(str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
 
         if request.POST["state"] == "captcha":

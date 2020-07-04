@@ -4,13 +4,13 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as dj_login
+from django.shortcuts import render
+from django.contrib.auth import login as dj_login
 
 from main.forms import RegisterForm, LoginForm
 
 
-# метод регистрации
+# регистрация
 def register(request):
     # если post запрос
     if request.method == 'POST':
@@ -72,12 +72,10 @@ def logout_view(request):
     return HttpResponseRedirect("login")
 
 
-# стартовая страница
+# вход в систему
 def login(request):
-    # print("login")
     # обработка входа
     if request.method == "POST":
-        # print("post "+str(request))
         # если в post-запросе есть поля логина/пароля
         if ("username" in request.POST) and ("password" in request.POST):
             username = request.POST['username']
@@ -94,6 +92,8 @@ def login(request):
                 return HttpResponseRedirect("personal")
             else:
                 messages.error(request, "пара логин-пароль не найдена")
+        else:
+            messages.error(request, "ошибка входа")
 
     template = 'login.html'
     context = {

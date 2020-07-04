@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# модуль с формами
 from django import forms
 
 
@@ -34,10 +33,12 @@ class RegisterForm(forms.Form):
                            label="Адрес электронной почты")
 
 
+# форма статьи
 class PaperForm(forms.Form):
+    # название статьи
     name = forms.CharField(widget=forms.Textarea(attrs={'rows': 1, 'cols': 100, 'placeholder': 'название'}),
                            label="Название статьи")
-
+    # текст статьи
     text = forms.CharField(widget=forms.Textarea(
         attrs={'rows': 20, 'cols': 100, 'placeholder': 'текст, который нужно проверить на уникальность'}),
         label="Текст статьи")
