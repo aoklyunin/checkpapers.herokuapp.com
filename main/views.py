@@ -28,7 +28,6 @@ def load_urls(request):
         options.add_argument("disable-gpu")
         options.add_argument('no-sandbox')
         options.add_argument('disable-dev-shm-usage')
-        options.add_experimental_option("detach", True)
         # создаём драйвер
         driver = webdriver.Chrome(str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
         # если нужно ввести капчу
