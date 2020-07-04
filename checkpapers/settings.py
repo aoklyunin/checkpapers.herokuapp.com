@@ -130,12 +130,12 @@ LOGGING = {
         # },
         'console': {
             'class': 'logging.StreamHandler',
-        },
+        }
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
+            'handlers': ['console'],
+            'level': 'ERROR',
             'propagate': True,
         },
     },

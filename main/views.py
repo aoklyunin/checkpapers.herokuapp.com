@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import time
-
 from django.db import connection
 from urllib.parse import urlencode
 from django.contrib import messages
