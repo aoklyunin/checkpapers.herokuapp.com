@@ -246,7 +246,7 @@ def need_login(request):
 def readPaper(request, paper_id):
     try:
         paper = Paper.objects.get(pk=paper_id)
-        return render(request, "readPaper.html", {
+        return render(request, "read_paper.html", {
             "paper": paper
         })
     except:
