@@ -39,13 +39,13 @@ def load_urls(request):
             for cookie in request.session["cookies"]:
                 driver.add_cookie(cookie)
             # подменяем значения скрытых полей(яндекс при каждой загрузке даёт новую капчу)
-            keyElem = driver.find_element_by_xpath("//*[@class='form__key']")
-            driver.execute_script("arguments[0].value = '" + request.POST["key"] + "';", keyElem)
-            keyRetPath = driver.find_element_by_xpath("//*[@class='form__retpath']")
-            driver.execute_script("arguments[0].value = '" + request.POST["retpath"] + "';", keyRetPath)
+            key_elem = driver.find_element_by_xpath("//*[@class='form__key']")
+            driver.execute_script("arguments[0].value = '" + request.POST["key"] + "';", key_elem)
+            key_ret_path = driver.find_element_by_xpath("//*[@class='form__retpath']")
+            driver.execute_script("arguments[0].value = '" + request.POST["retpath"] + "';", key_ret_path)
             # отправляем код капчи
-            input = driver.find_element_by_xpath("/html/body/div/form/div[3]/div[1]/input")
-            input.send_keys(request.POST["code"])
+            input_elem = driver.find_element_by_xpath("/html/body/div/form/div[3]/div[1]/input")
+            input_elem.send_keys(request.POST["code"])
             submit = driver.find_element_by_xpath("/html/body/div/form/button")
             submit.click()
 
@@ -59,30 +59,30 @@ def load_urls(request):
             query = urlencode({'text': '"' + shild + '"'})
             url = "http://yandex.ru/search"
             driver.get(url + '?' + query)
-            captchaImgs = driver.find_elements_by_xpath("//div[@class='captcha__image']/img")
+            captcha_imgs = driver.find_elements_by_xpath("//div[@class='captcha__image']/img")
             # print(captchaImgs)
-            if len(captchaImgs) > 0:
+            if len(captcha_imgs) > 0:
                 request.session["urls"] = list(urls)
                 # request.session["session_id"] = driver.session_id
                 request.session["cookies"] = driver.get_cookies()
-                captcha = captchaImgs[0].get_attribute("src")
+                captcha = captcha_imgs[0].get_attribute("src")
                 key = driver.find_element_by_xpath("//*[@class='form__key']").get_attribute("value")
                 # print(key)
                 retpath = driver.find_element_by_xpath("//*[@class='form__retpath']").get_attribute("value")
-                driverUrl = driver.current_url
+                driver_url = driver.current_url
                 driver.close()
                 return JsonResponse({
                     "state": "needCaptcha",
                     "captcha": captcha,
-                    "url": driverUrl,
+                    "url": driver_url,
                     "key": key,
                     "retpath": retpath,
                 })
             for link in driver.find_elements_by_xpath('//a'):
-                strLink = str(link.get_attribute("href"))
-                if (not "yandex" in strLink) and (not "bing" in strLink) and (not "google" in strLink) and (
-                        not "mail" in strLink) and (strLink is not None):
-                    urls.add(strLink)
+                str_link = str(link.get_attribute("href"))
+                if (not "yandex" in str_link) and (not "bing" in str_link) and (not "google" in str_link) and (
+                        not "mail" in str_link) and (str_link is not None):
+                    urls.add(str_link)
             request.session["currentShild"] = request.session["currentShild"] + 1
             # print(strLink)
         # if link.startswith('/url?q=') and not link.contains("google.com"):
@@ -164,61 +164,12 @@ def check(request):
 
 
 # Create your views here.
-def checkWithYandex(request):
-    # return HttpResponse('Hello from Python!')
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect("/need_login")
-
-    # если post запрос
-    if request.method == 'POST':
-        # строим форму на основе запроса
-        form = PaperForm(request.POST)
-        # если форма заполнена корректно
-        if form.is_valid():
-            data = {
-                'text': form.cleaned_data["text"],
-                'name': form.cleaned_data["name"],
-            }
-            # проверяем, что пароли совпадают
-            if form.cleaned_data["text"] == "":
-                # выводим сообщение и перезаполняем форму
-                messages.error(request, "Вы послали на проверку статью без текста")
-                # проверяем, что пароли совпадают
-            elif form.cleaned_data["name"] == "":
-                # выводим сообщение и перезаполняем форму
-                messages.error(request, "Вы послали на проверку статью без текста")
-            else:
-                [u, t] = createPaper(form.cleaned_data["text"], form.cleaned_data["name"], request.user)
-                if u < 0:
-                    messages.error(request, "Ошибка API поиска")
-                    return HttpResponseRedirect("/check")
-                else:
-                    messages.info(request, "Уникальность текста: " + f"{u:.{1}f}%".format(
-                        u) + ", правдивость: " + f"{t:.{1}f}%".format(t))
-                return HttpResponseRedirect("/personal")
-            # перерисовываем окно
-            return render(request, "check.html", {
-                'form': PaperForm(initial=data),
-            })
-        else:
-            # перезагружаем страницу
-            messages.error(request, "Неправильно заполнена форма")
-
-            return HttpResponseRedirect("check")
-    else:
-        # возвращаем простое окно регистрации
-        return render(request, "check.html", {
-            'form': PaperForm()
-        })
-
-
-# Create your views here.
 def about(request):
     # return HttpResponse('Hello from Python!')
     return render(request, "about.html")
 
 
-def personalFirsPage(request):
+def personal_firs_page(request):
     return personal(request, 1)
 
 
