@@ -7,7 +7,7 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from selenium import webdriver
 from main.forms import PaperForm
 from misc.check_papers import check_paper, get_shilds
@@ -26,7 +26,7 @@ def load_urls(request):
         # опции веб-драйвера
         options = webdriver.ChromeOptions()
         # эта опция используется только для деплоя на heroku
-        # options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+        options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
         options.add_argument('headless')
         options.add_argument("disable-gpu")
         options.add_argument('no-sandbox')
