@@ -18,42 +18,45 @@ def index(request):
 
 
 # загрузить ссылки на статьи
-def loadUrls(request):
+def load_urls(request):
     # если post запрос
     if request.method == 'POST':
+        # опции веб-драйвера
         options = webdriver.ChromeOptions()
-        options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+        #options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
         options.add_argument('headless')
         options.add_argument("disable-gpu")
         options.add_argument('no-sandbox')
         options.add_argument('disable-dev-shm-usage')
         options.add_experimental_option("detach", True)
+        # создаём драйвер
         driver = webdriver.Chrome(str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
-
+        # если нужно ввести капчу
         if request.POST["state"] == "captcha":
+            # переходим на по сохранённому адресу страницы с капчей
             driver.get(request.POST["url"])
+            # восстанавливаем куки
             for cookie in request.session["cookies"]:
-                print(cookie)
                 driver.add_cookie(cookie)
-
+            # подменяем значения скрытых полей(яндекс при каждой загрузке даёт новую капчу)
             keyElem = driver.find_element_by_xpath("//*[@class='form__key']")
             driver.execute_script("arguments[0].value = '" + request.POST["key"] + "';", keyElem)
             keyRetPath = driver.find_element_by_xpath("//*[@class='form__retpath']")
             driver.execute_script("arguments[0].value = '" + request.POST["retpath"] + "';", keyRetPath)
-
+            # отправляем код капчи
             input = driver.find_element_by_xpath("/html/body/div/form/div[3]/div[1]/input")
             input.send_keys(request.POST["code"])
             submit = driver.find_element_by_xpath("/html/body/div/form/button")
             submit.click()
 
+        # множество ссылок
         urls = set()
+        # добавляем в него список всех уже сохранённых ссылок
         urls.update(request.session["urls"])
+        # перебираем необработанные шилды(начинаются с номера currentShild)
         for i in range(request.session["currentShild"], len(request.session["shilds"])):
             shild = request.session["shilds"][i]
-            print(shild)
             query = urlencode({'text': '"' + shild + '"'})
-            # print(url + query)
-            # request = Request(url + '?' + query, None, headers)
             url = "http://yandex.ru/search"
             driver.get(url + '?' + query)
             captchaImgs = driver.find_elements_by_xpath("//div[@class='captcha__image']/img")
@@ -93,8 +96,8 @@ def loadUrls(request):
         return HttpResponseRedirect("personal")
 
 
-def processUrls(request):
-    print("processUrls")
+def process_urls(request):
+    print("process_urls")
     [u, t] = checkPaper(request.session["shilds"], request.session["urls"])
     request.session["urls"] = []
     request.session["shilds"] = []
@@ -117,7 +120,7 @@ def processUrls(request):
 def check(request):
     # return HttpResponse('Hello from Python!')
     if not request.user.is_authenticated:
-        return HttpResponseRedirect("/needlogin")
+        return HttpResponseRedirect("/need_login")
 
     # если post запрос
     if request.method == 'POST':
@@ -164,7 +167,7 @@ def check(request):
 def checkWithYandex(request):
     # return HttpResponse('Hello from Python!')
     if not request.user.is_authenticated:
-        return HttpResponseRedirect("/needlogin")
+        return HttpResponseRedirect("/need_login")
 
     # если post запрос
     if request.method == 'POST':
@@ -238,10 +241,10 @@ def personal(request, page):
             "page": page
         })
     else:
-        return HttpResponseRedirect("/needlogin")
+        return HttpResponseRedirect("/need_login")
 
 
-def papersFirsPage(request):
+def papers_first_page(request):
     return papers(request, 1)
 
 
@@ -264,13 +267,13 @@ def papers(request, page):
             "page": page
         })
     else:
-        return HttpResponseRedirect("/needlogin")
+        return HttpResponseRedirect("/need_login")
 
 
-def deletePaper(request, paper_id):
+def delete_paper(request, paper_id):
     # return HttpResponse('Hello from Python!')
     if not request.user.is_authenticated:
-        return HttpResponseRedirect("/needlogin")
+        return HttpResponseRedirect("/need_login")
 
     try:
         paper = Paper.objects.get(pk=paper_id)
@@ -285,9 +288,9 @@ def deletePaper(request, paper_id):
     return HttpResponseRedirect("/personal")
 
 
-def needLogin(request):
+def need_login(request):
     # return HttpResponse('Hello from Python!')
-    return render(request, "needlogin.html")
+    return render(request, "need_login.html")
 
 
 def readPaper(request, paper_id):

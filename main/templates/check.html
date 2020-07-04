@@ -137,14 +137,14 @@ $('#checkForm').submit(function(){
 
 function load(data){
     $.post(
-        '/loadurls',
+        '/load_urls',
         data,
         function(msg){
             if (msg["state"]=="needCaptcha"){
                 hideProgress();
                 setCaptcha(msg);
             }else{
-                window.location ='/processurls';
+                window.location ='/process_urls';
             }
         }
     );

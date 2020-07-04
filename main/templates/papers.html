@@ -78,7 +78,7 @@
             {% for paper in papers %}
             <tr>
                 <td>
-                    <a href="/readpaper/{{paper.id}}">
+                    <a href="/read_paper/{{paper.id}}">
                         {{ paper.name| truncatechars:100}}
                     </a>
                 </td>
@@ -92,7 +92,7 @@
                     {% if flgAllPapers %}
                     {{request.user.username}}
                     {% else %}
-                    <a href="deletepaper/{{paper.id}}">
+                    <a href="delete_paper/{{paper.id}}">
                         <img src="{%static 'img/deleteButton.png'%}" width=15px height=15px class="deleteImg"
                              title="Удалить статью">
                     </a>

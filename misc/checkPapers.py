@@ -88,7 +88,7 @@ def checkPaper(currentPaperShilds, urlList):
     return [(1 - float(sumU) / len(findShildCnt)) * 100, float(sumT) / len(findShildCnt) * 100]
 
 
-def loadUrls(shilds):
+def load_urls(shilds):
     options = webdriver.ChromeOptions()
     # options.add_argument('headless')
     # options.add_argument('window-size=1920x1080')
@@ -122,7 +122,7 @@ def createPaper(text, name, author):
     print("create paper")
     shilds = getShilds(text, SHILD_LENGTH)
     print("geted shilds")
-    urls = loadUrls(shilds)
+    urls = load_urls(shilds)
     if len(urls) == 0:
         return [-1, 0]
     [u, t] = checkPaper(shilds, urls)
