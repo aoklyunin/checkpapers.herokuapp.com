@@ -38,8 +38,6 @@ class UrlToProcess(models.Model):
     value = UnlimitedCharField(default="")
     # пользователь, создавший шилды
     author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
-    # флаг, что проверка не удалась
-    flg_process_error = models.BooleanField(default=False)
 
 
 # шилд для добавления

@@ -6,8 +6,10 @@ from urllib.request import urlopen, Request
 from wikipedia import wikipedia
 from main.models import ShildFromURLText, ShildToProcess, UrlToProcess, NotUsedPaper, Paper, AddPaperConf, \
     ShildFromNotUsedPaper
-from main.views import MAX_SCRIPT_PROCESS_TIME
 from misc.check_papers import get_shilds, text_from_html, TRUTH_SHILD_CNT
+
+# максимальное время выполнения скрипта у heroku ограничение на время ответа 30, берём с запасом 20
+MAX_SCRIPT_PROCESS_TIME = 20
 
 
 # обработка ссылок: инициализация

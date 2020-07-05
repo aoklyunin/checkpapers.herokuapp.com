@@ -14,9 +14,6 @@ from main.process import process_urls_start, process_papers, process_urls_body, 
 from misc.check_papers import get_shilds
 from .models import Paper, AddPaperConf, ShildToProcess, UrlToProcess
 
-# максимальное время выполнения скрипта у heroku ограничение на время ответа 30, берём с запасом 20
-MAX_SCRIPT_PROCESS_TIME = 20
-
 
 # главная страница
 def index(request):
