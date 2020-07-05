@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import time
-import wikipedia
 from django.db import connection
 from urllib.parse import urlencode
 from django.contrib import messages
@@ -9,11 +8,11 @@ from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.timezone import now
-from urllib.request import urlopen, Request
 from selenium import webdriver
 from main.forms import PaperForm
-from misc.check_papers import get_shilds, text_from_html, TRUTH_SHILD_CNT
-from .models import Paper, AddPaperConf, ShildToProcess, UrlToProcess, NotUsedPaper, ShildFromURLText
+from main.process import process_urls_start, process_papers, process_urls_body, save_paper
+from misc.check_papers import get_shilds
+from .models import Paper, AddPaperConf, ShildToProcess, UrlToProcess
 
 # максимальное время выполнения скрипта у heroku ограничение на время ответа 30, берём с запасом 20
 MAX_SCRIPT_PROCESS_TIME = 20
@@ -61,14 +60,18 @@ def check(request):
                     author=request.user,
                     start_time=now()
                 )
+                # очищаем шилды
                 ShildToProcess.objects.all().filter(author=request.user).delete()
+                # очищаем ссылки
                 UrlToProcess.objects.all().filter(author=request.user).delete()
+                # сохраняем шилды для поиска и последующего удаления
                 ShildToProcess.objects.bulk_create([ShildToProcess(**{
                     'value': m,
                     'to_delete': False,
                     'author': request.user,
                     'founded_cnt': 0
                 }) for m in shilds])
+                # сохраняем шилды для обработки
                 ShildToProcess.objects.bulk_create([ShildToProcess(**{
                     'value': m,
                     'to_delete': True,
@@ -104,7 +107,7 @@ def load_urls(request):
         options.add_argument('--ignore-certificate-errors')
         # создаём драйвер
         driver = webdriver.Chrome(str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
-
+        # флаг, что найдена капча
         flg_get_captcha = False
 
         # если нужно ввести капчу
@@ -140,7 +143,7 @@ def load_urls(request):
 
         # получаем общее кол-во шилдов статьи
         shild_cnt = len(ShildToProcess.objects.all().filter(to_delete=False))
-        # перебираем необработанные шилды(начинаются с номера currentShild)
+        # перебираем необработанные шилды
         for shild in ShildToProcess.objects.all().filter(to_delete=True):
             # если превышено максимальное время выполнения скрипта
             if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
@@ -156,7 +159,8 @@ def load_urls(request):
                     "state": "loadNext",
                     "process-text": "Поиск текстов: " + f"{load_percent:.{1}f}%".format(load_percent)
                 })
-
+            # если не найдена капча, выполняем новый запрос
+            # (после вводы капчи, яндекс перенаправляет на последний сделанный запрос)
             if not flg_get_captcha:
                 query = urlencode({'text': '"' + shild.value + '"'})
                 url = "http://yandex.ru/search"
@@ -194,6 +198,7 @@ def load_urls(request):
                 if ("yandex" not in str_link) and ("bing" not in str_link) and ("google" not in str_link) and (
                         "mail" not in str_link) and (str_link is not None):
                     urls.add(str_link)
+            # удаляем обработанный шилд
             shild.delete()
         # сохраняем уже обработанные ссылки
         UrlToProcess.objects.all().filter(author=request.user).delete()
@@ -211,162 +216,28 @@ def process_urls(request):
         # из-за долгого времени ожидания соединение обрывается
         # нужно его перезапускать
         connection.connect()
+        # получаем параметры статьи
         add_paper_conf = AddPaperConf.objects.get(author=request.user)
-
+        # если это только начало обработки
         if request.POST["state"] == "start":
-            NotUsedPaper.objects.bulk_create(
-                [NotUsedPaper(**{'paper': paper, 'author': request.user}) for paper in Paper.objects.all()]
-            )
-            add_paper_conf.check_url_cnt = len(UrlToProcess.objects.all().filter(author=request.user))
-            add_paper_conf.save()
-            return JsonResponse({
-                "state": "processPaperNext",
-                "process-text": "Сверка с уже загруженными статьями..."
-            })
+            return process_urls_start(request, add_paper_conf)
 
         # время начала загрузки
         start_time = time.time()
+
+        # получаем время работы скрипта
         time_delta = (now() - add_paper_conf.start_time)
         total_seconds = time_delta.total_seconds()
-
+        # если оно не превышает час
         if total_seconds < 60 * 60:
+            # если нужно обрабатывать статьи
             if request.POST["state"] == "processPapers":
-                non_used_paper_cnt = len(NotUsedPaper.objects.all().filter(author=request.user))
-                paper_cnt = len(Paper.objects.all())
-                if paper_cnt == 0:
-                    return JsonResponse({
-                        "state": "completeProcessPaper",
-                        "process-text": "Сверка с сайтами..."
-                    })
-                load_percent = float(paper_cnt - non_used_paper_cnt) / paper_cnt * 100
-                not_used_papers = [not_used_paper for not_used_paper in NotUsedPaper.objects.all()]
-                for non_used_paper in not_used_papers:
-                    # если превышено максимальное время выполнения скрипта
-                    if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
-                        return JsonResponse({
-                            "state": "processPaperNext",
-                            "process-text": "Сверка с уже загруженными статьями: " + f"{load_percent:.{1}f}%".format(
-                                load_percent)
-                        })
-                    for founded_shild in get_shilds(non_used_paper.paper.text):
-                        try:
-                            current_shild_to_process = ShildToProcess.objects.get(
-                                author=request.user,
-                                to_delete=False,
-                                value=founded_shild
-                            )
-                            current_shild_to_process.founded_cnt = current_shild_to_process.founded_cnt + 1
-                            current_shild_to_process.save()
-                        except:
-                            pass
-                    non_used_paper.delete()
-                return JsonResponse({
-                    "state": "completeProcessPaper",
-                    "process-text": "Сверка с сайтами..."
-                })
+                return process_papers(request, start_time)
             if request.POST["state"] == "processUrls":
-                print("post: processUrls")
-                for url_to_process in UrlToProcess.objects.all().filter(author=request.user):
-                    print(url_to_process.value)
-                    # если превышено максимальное время выполнения скрипта
-                    if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
-                        load_percent = float(add_paper_conf.check_url_cnt - len(
-                            UrlToProcess.objects.all().filter(
-                                author=request.user))) / add_paper_conf.check_url_cnt * 100
-                        print("url time limit")
-                        return JsonResponse({
-                            "state": "processUrlNext",
-                            "process-text": "Сверка с сайтами: " + f"{load_percent:.{1}f}%".format(
-                                load_percent)
-                        })
+                return process_urls_body(request, add_paper_conf, start_time)
 
-                    # если шилды для url не загружены
-                    if len(ShildFromURLText.objects.all().filter(url=url_to_process)) == 0:
-                        try:
-                            # если ссылка на википедию, то быстрее будет загружать текст статьи при помощи API
-                            if "wikipedia" in url_to_process.value:
-                                # получаем название статьи
-                                article_name = (url_to_process.value.split("/"))[-1].replace("_", " ")
-                                # получаем текст статьи
-                                text = wikipedia.page(article_name).summary
-                            else:
-                                req = Request(url_to_process.value, headers={'User-Agent': "Magic Browser"})
-                                text = text_from_html(urlopen(req, timeout=3).read())
-                            ShildFromURLText.objects.bulk_create(
-                                [ShildFromURLText(**{'value': m, 'url': url_to_process}) for m in get_shilds(text)])
-                        except:
-                            pass
+        return save_paper(request, add_paper_conf)
 
-                    # перебираем шилды загруженного текста
-                    for founded_shild in ShildFromURLText.objects.all().filter(url=url_to_process):
-                        # если превышено максимальное время выполнения скрипта
-                        if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
-                            load_percent = float(add_paper_conf.check_url_cnt - len(UrlToProcess.objects.all().filter(
-                                author=request.user))) / add_paper_conf.check_url_cnt * 100
-                            print("shild time limit " + str(
-                                len(ShildFromURLText.objects.all().filter(url=url_to_process))))
-                            return JsonResponse({
-                                "state": "processUrlNext",
-                                "process-text": "Сверка с сайтами: " + f"{load_percent:.{1}f}%".format(
-                                    load_percent)
-                            })
-                        try:
-                            current_shild_to_process = ShildToProcess.objects.get(
-                                author=request.user,
-                                to_delete=False,
-                                value=founded_shild
-                            )
-                            current_shild_to_process.founded_cnt = current_shild_to_process.founded_cnt + 1
-                            current_shild_to_process.save()
-                        except:
-                            pass
-                        founded_shild.delete()
-                    url_to_process.delete()
-
-                return JsonResponse({
-                    "state": "completeUrl",
-                    "process-text": "Сохранение результатов..."
-                })
-
-        # кол-во шилдов, которые были найдены
-        sum_u = 0
-        # кол-во шилдов, которые встретились хотя бы в трёх различных источниках
-        sum_t = 0
-        # считаем кол-во встреченных и правдоподобных шилдов
-        shilds = ShildToProcess.objects.all().filter(author=request.user, to_delete=False)
-        for shild in shilds:
-            if shild.founded_cnt > TRUTH_SHILD_CNT:
-                sum_t = sum_t + 1
-            if not shild.founded_cnt:
-                sum_u = sum_u + 1
-
-        # возвращаем уникальность и правдоподобность статьи
-        u = float(sum_u) / len(shilds) * 100
-        t = float(sum_t) / len(shilds) * 100
-
-        # очищаем списки
-        ShildToProcess.objects.all().filter(author=request.user).delete()
-        UrlToProcess.objects.all().filter(author=request.user).delete()
-
-        # создаём запись о статье
-        Paper.objects.create(
-            name=add_paper_conf.name,
-            author=request.user,
-            text=add_paper_conf.text,
-            uniquenessPercent=u,
-            truth=t
-        )
-
-        # очищаем параметры добаления статьи
-        try:
-            AddPaperConf.objects.get(author=request.user).delete()
-        except:
-            pass
-        messages.info(request, "Оригинальность текста: " + f"{u:.{1}f}%".format(
-            u) + ", правдоподобность: " + f"{t:.{1}f}%".format(t))
-        return JsonResponse({
-            "state": "ready",
-        })
     else:
         messages.error(request, "этот метод можно вызывать только через POST запрос")
         return HttpResponseRedirect("personal")

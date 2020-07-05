@@ -58,7 +58,7 @@ class ShildToProcess(models.Model):
 class NotUsedPaper(models.Model):
     # статья
     paper = models.ForeignKey(Paper, on_delete=models.CASCADE, default=None)
-    # пользователь, создавший шилды
+    # пользователь, создавший шилд
     author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
 
 
@@ -67,3 +67,14 @@ class ShildFromURLText(models.Model):
     value = UnlimitedCharField(default="")
     # пользователь, создавший шилды
     url = models.ForeignKey(UrlToProcess, on_delete=models.CASCADE, default=None)
+    # пользователь, создавший шилд
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+
+
+class ShildFromNotUsedPaper(models.Model):
+    # текст шилда
+    value = UnlimitedCharField(default="")
+    # пользователь, создавший шилды
+    paper = models.ForeignKey(NotUsedPaper, on_delete=models.CASCADE, default=None)
+    # пользователь, создавший шилды
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
