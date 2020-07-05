@@ -118,7 +118,7 @@ def process_urls_body(request, add_paper_conf, start_time):
                     text = wikipedia.page(article_name).summary
                 else:
                     req = Request(url_to_process.value, headers={'User-Agent': "Magic Browser"})
-                    text = text_from_html(urlopen(req, timeout=3).read())
+                    text = text_from_html(urlopen(req, timeout=1).read())
                 ShildFromURLText.objects.bulk_create(
                     [ShildFromURLText(**{'value': m, 'url': url_to_process, 'author': request.user}) for m in
                      get_shilds(text)])
