@@ -200,7 +200,7 @@ def load_urls(request):
                 # добавляем только те, которые ссылаются не на яндекс
                 str_link = str(link.get_attribute("href"))
                 if ("yandex" not in str_link) and ("bing" not in str_link) and ("google" not in str_link) and (
-                        "mail" not in str_link) and (str_link is not None):
+                        "mail" not in str_link) and (".pdf" not in str_link) and (str_link is not None):
                     urls.add(str_link)
             # удаляем обработанный шилд
             shild.delete()
