@@ -10,8 +10,8 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.timezone import now
 from selenium import webdriver
 from main.forms import PaperForm
-from main.process import process_urls_start, process_papers, process_urls_body, save_paper, MAX_SCRIPT_PROCESS_TIME
-from misc.check_papers import get_shilds
+from main.process import process_urls_start, process_papers, process_urls_body, save_paper
+from misc.check_papers import get_shilds, MAX_SCRIPT_PROCESS_TIME
 from .models import Paper, AddPaperConf, ShildToProcess, UrlToProcess
 
 
@@ -43,7 +43,7 @@ def check(request):
                 return HttpResponseRedirect("check")
             # проверяем, что у в статье достаточное кол-во слов
             else:
-                shilds = get_shilds(form.cleaned_data["text"])
+                shilds = get_shilds(form.cleaned_data["text"], time.time())
                 if len(shilds) == 0:
                     messages.error(request, "Статья содержит слдишком мало слов")
                     return JsonResponse({"state": "formError"})

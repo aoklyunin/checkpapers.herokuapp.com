@@ -6,10 +6,7 @@ from urllib.request import urlopen, Request
 from wikipedia import wikipedia
 from main.models import ShildFromURLText, ShildToProcess, UrlToProcess, NotUsedPaper, Paper, AddPaperConf, \
     ShildFromNotUsedPaper
-from misc.check_papers import get_shilds, text_from_html, TRUTH_SHILD_CNT
-
-# максимальное время выполнения скрипта у heroku ограничение на время ответа 30, берём с запасом 20
-MAX_SCRIPT_PROCESS_TIME = 20
+from misc.check_papers import get_shilds, text_from_html, TRUTH_SHILD_CNT, MAX_SCRIPT_PROCESS_TIME
 
 
 # обработка ссылок: инициализация
@@ -55,7 +52,7 @@ def process_papers(request, start_time):
         if len(ShildFromNotUsedPaper.objects.all().filter(paper=non_used_paper, author=request.user)) == 0:
             ShildFromNotUsedPaper.objects.bulk_create(
                 [ShildFromNotUsedPaper(**{'value': m, 'paper': non_used_paper, 'author': request.user}) for m in
-                 get_shilds(non_used_paper.paper.text)])
+                 get_shilds(non_used_paper.paper.text,start_time)])
 
         # перебираем шилды рассматриваемой статьи
         for founded_shild in ShildFromNotUsedPaper.objects.all().filter(paper=non_used_paper, author=request.user):
@@ -121,7 +118,7 @@ def process_urls_body(request, add_paper_conf, start_time):
                     text = text_from_html(urlopen(req, timeout=1).read())
                 ShildFromURLText.objects.bulk_create(
                     [ShildFromURLText(**{'value': m, 'url': url_to_process, 'author': request.user}) for m in
-                     get_shilds(text)])
+                     get_shilds(text,start_time)])
             except:
                 pass
 

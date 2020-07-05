@@ -14,6 +14,8 @@ from django.db import connection
 SHILD_LENGTH = 5
 # кол-во источников, в которых встретился шилд, чтобы можно было считать шилд правдоподобным
 TRUTH_SHILD_CNT = 3
+# максимальное время выполнения скрипта у heroku ограничение на время ответа 30, берём с запасом 20
+MAX_SCRIPT_PROCESS_TIME = 20
 
 
 # фильтр видимых html тэгов
@@ -34,13 +36,16 @@ def text_from_html(body):
 
 
 # получить список шилдов из текста
-def get_shilds(text):
+def get_shilds(text, start_time):
     text.replace("\n", " ")
     text_with_spaces = re.sub(r'[^A-zА-я0-9 ]', '', text)
     text_with_one_space = re.sub(r'\s+', ' ', text_with_spaces)
     words = text_with_one_space.split(" ")
     shilds = []
     for i in range(len(words) - SHILD_LENGTH):
+        # если превышено максимальное время выполнения скрипта
+        if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
+            break
         shild = " ".join(words[i:i + SHILD_LENGTH])
         shilds.append(shild)
     return shilds
@@ -62,7 +67,7 @@ def check_paper(current_paper_shilds, url_list):
         if time.time() - start_time > 60 * 60:
             # прерываем цикл
             break
-        for foundedShild in get_shilds(paper.text):
+        for foundedShild in get_shilds(paper.text, time.time()):
             if foundedShild in current_paper_shilds:
                 index = current_paper_shilds.index(foundedShild)
                 find_shild_cnt[index] = find_shild_cnt[index] + 1
@@ -85,7 +90,7 @@ def check_paper(current_paper_shilds, url_list):
                 req = Request(url, headers={'User-Agent': "Magic Browser"})
                 text = text_from_html(urlopen(req, timeout=3).read())
             # перебираем шилды текста с которым сравниваем
-            for foundedShild in get_shilds(text):
+            for foundedShild in get_shilds(text, time.time()):
                 # если в проверяемой статье есть такой шилд, то увеличиваем
                 # соответствующий элемент массива счётчиков
                 if foundedShild in current_paper_shilds:
@@ -112,7 +117,7 @@ def check_paper(current_paper_shilds, url_list):
 # проверить статью с помощью API яндекса
 def check_paper_with_yandex_api(current_paper):
     # получаем шилды программы
-    current_paper_shilds = get_shilds(current_paper)
+    current_paper_shilds = get_shilds(current_paper, time.time())
     # подключаем API яндекса
     yandex = yandex_search.Yandex(api_user='aoklyunin', api_key='03.210671841:b75fddc50ebc4d5938fc5c192bd47964')
     # создаём множество ссылок
