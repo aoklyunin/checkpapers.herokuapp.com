@@ -268,6 +268,10 @@ def process_urls(request):
                 print("post: processUrls")
                 for url_to_process in UrlToProcess.objects.all().filter(author=request.user):
                     print(url_to_process.value)
+                    # загружаем видимый текст со страницы
+                    if url_to_process.value is None:
+                        url_to_process.delete()
+                        continue
                     # если превышено максимальное время выполнения скрипта
                     if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
                         load_percent = float(add_paper_conf.check_url_cnt - len(
@@ -288,7 +292,6 @@ def process_urls(request):
                             # получаем текст статьи
                             text = wikipedia.page(article_name).summary
                         else:
-                            # загружаем видимый текст со страницы
                             req = Request(url_to_process.value, headers={'User-Agent': "Magic Browser"})
                             text = text_from_html(urlopen(req, timeout=3).read())
                         ShildFromURLText.objects.bulk_create(
