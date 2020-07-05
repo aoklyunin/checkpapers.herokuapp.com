@@ -168,8 +168,16 @@ function process(data){
                 $('.process-text').text(msg["process-text"]);
                 process({'state':'processPapers'});
             }else if ( (msg["state"]=="completeProcessPaper")|| (msg["state"]=="processUrlNext")){
-                  $('.process-text').text(msg["process-text"]);
-                 process({'state':'processUrls'});
+                $('.process-text').text(msg["process-text"]);
+                var flgComplete = false;
+                while (!flgComplete){
+                    try{
+                        process({'state':'processUrls'});
+                        flgComplete = true;
+                    }catch (e) {
+
+                    }
+                }
             }else if (msg["state"]=="completeUrl"){
                 $('.process-text').text(msg["process-text"]);
                 process({'state':'create'});

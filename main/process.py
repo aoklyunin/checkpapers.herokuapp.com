@@ -118,7 +118,7 @@ def process_urls_body(request, add_paper_conf, start_time):
                 else:
                     req = Request(url_to_process.value, headers={'User-Agent': "Magic Browser"})
                     text = text_from_html(urlopen(req, timeout=1).read())
-                print(text)
+                #print(text)
                 ShildFromURLText.objects.bulk_create(
                     [ShildFromURLText(**{'value': m, 'url': url_to_process, 'author': request.user}) for m in
                      get_shilds(text, start_time)])
@@ -129,12 +129,13 @@ def process_urls_body(request, add_paper_conf, start_time):
         print("loop shilds")
         # перебираем шилды загруженного текста
         for found_shild in ShildFromURLText.objects.all().filter(url=url_to_process, author=request.user):
-            #print(found_shild.value)
+            # print(found_shild.value)
             # если превышено максимальное время выполнения скрипта
             if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
                 # рассчитываем процент загрузки
                 load_percent = float(add_paper_conf.check_url_cnt - len(UrlToProcess.objects.all().filter(
                     author=request.user))) / add_paper_conf.check_url_cnt * 100
+                print("shild time limit")
                 return JsonResponse({
                     "state": "processUrlNext",
                     "process-text": "Сверка с сайтами: " + f"{load_percent:.{1}f}%".format(
@@ -154,6 +155,7 @@ def process_urls_body(request, add_paper_conf, start_time):
             except:
                 pass
             found_shild.delete()
+        print("loop shilds complete")
         url_to_process.delete()
 
     return JsonResponse({
