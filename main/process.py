@@ -52,10 +52,10 @@ def process_papers(request, start_time):
         if len(ShildFromNotUsedPaper.objects.all().filter(paper=non_used_paper, author=request.user)) == 0:
             ShildFromNotUsedPaper.objects.bulk_create(
                 [ShildFromNotUsedPaper(**{'value': m, 'paper': non_used_paper, 'author': request.user}) for m in
-                 get_shilds(non_used_paper.paper.text,start_time)])
+                 get_shilds(non_used_paper.paper.text, start_time)])
 
         # перебираем шилды рассматриваемой статьи
-        for founded_shild in ShildFromNotUsedPaper.objects.all().filter(paper=non_used_paper, author=request.user):
+        for found_shild in ShildFromNotUsedPaper.objects.all().filter(paper=non_used_paper, author=request.user):
             # если превышено максимальное время выполнения скрипта
             if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
                 # рассчитываем процент загрузки
@@ -71,7 +71,7 @@ def process_papers(request, start_time):
                 current_shild_to_process = ShildToProcess.objects.get(
                     author=request.user,
                     to_delete=False,
-                    value=founded_shild.value
+                    value=found_shild.value
                 )
                 # увеличиваем его счётчик на 1
                 current_shild_to_process.founded_cnt = current_shild_to_process.founded_cnt + 1
@@ -79,7 +79,7 @@ def process_papers(request, start_time):
             except:
                 pass
             # удаляем обработанный шилд
-            founded_shild.delete()
+            found_shild.delete()
         # удаляем обработанную статью
         non_used_paper.delete()
     return JsonResponse({
@@ -92,6 +92,7 @@ def process_papers(request, start_time):
 def process_urls_body(request, add_paper_conf, start_time):
     # перебираем необработанные ссылки
     for url_to_process in UrlToProcess.objects.all().filter(author=request.user):
+        print(url_to_process.value)
         # если превышено максимальное время выполнения скрипта
         if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
             # рассчитываем процент загрузки
@@ -106,6 +107,7 @@ def process_urls_body(request, add_paper_conf, start_time):
 
         # если шилды для url не загружены
         if len(ShildFromURLText.objects.all().filter(url=url_to_process, author=request.user)) == 0:
+            print("generate shilds")
             try:
                 # если ссылка на википедию, то быстрее будет загружать текст статьи при помощи API
                 if "wikipedia" in url_to_process.value:
@@ -116,14 +118,18 @@ def process_urls_body(request, add_paper_conf, start_time):
                 else:
                     req = Request(url_to_process.value, headers={'User-Agent': "Magic Browser"})
                     text = text_from_html(urlopen(req, timeout=1).read())
+                print(text)
                 ShildFromURLText.objects.bulk_create(
                     [ShildFromURLText(**{'value': m, 'url': url_to_process, 'author': request.user}) for m in
-                     get_shilds(text,start_time)])
+                     get_shilds(text, start_time)])
+                print("shilds generated")
             except:
                 pass
 
+        print("loop shilds")
         # перебираем шилды загруженного текста
-        for founded_shild in ShildFromURLText.objects.all().filter(url=url_to_process, author=request.user):
+        for found_shild in ShildFromURLText.objects.all().filter(url=url_to_process, author=request.user):
+            print(found_shild.value)
             # если превышено максимальное время выполнения скрипта
             if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
                 # рассчитываем процент загрузки
@@ -139,14 +145,15 @@ def process_urls_body(request, add_paper_conf, start_time):
                 current_shild_to_process = ShildToProcess.objects.get(
                     author=request.user,
                     to_delete=False,
-                    value=founded_shild.value
+                    value=found_shild.value
                 )
                 # увеличиваем его счётчик на 1
                 current_shild_to_process.founded_cnt = current_shild_to_process.founded_cnt + 1
                 current_shild_to_process.save()
+                print("shild found")
             except:
                 pass
-            founded_shild.delete()
+            found_shild.delete()
         url_to_process.delete()
 
     return JsonResponse({
