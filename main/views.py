@@ -268,10 +268,6 @@ def process_urls(request):
                 print("post: processUrls")
                 for url_to_process in UrlToProcess.objects.all().filter(author=request.user):
                     print(url_to_process.value)
-                    # загружаем видимый текст со страницы
-                    if url_to_process.value is None:
-                        url_to_process.delete()
-                        continue
                     # если превышено максимальное время выполнения скрипта
                     if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
                         load_percent = float(add_paper_conf.check_url_cnt - len(
@@ -283,19 +279,23 @@ def process_urls(request):
                             "process-text": "Сверка с сайтами: " + f"{load_percent:.{1}f}%".format(
                                 load_percent)
                         })
+
                     # если шилды для url не загружены
                     if len(ShildFromURLText.objects.all().filter(url=url_to_process)) == 0:
-                        # если ссылка на википедию, то быстрее будет загружать текст статьи при помощи API
-                        if "wikipedia" in url_to_process.value:
-                            # получаем название статьи
-                            article_name = (url_to_process.value.split("/"))[-1].replace("_", " ")
-                            # получаем текст статьи
-                            text = wikipedia.page(article_name).summary
-                        else:
-                            req = Request(url_to_process.value, headers={'User-Agent': "Magic Browser"})
-                            text = text_from_html(urlopen(req, timeout=3).read())
-                        ShildFromURLText.objects.bulk_create(
-                            [ShildFromURLText(**{'value': m, 'url': url_to_process}) for m in get_shilds(text)])
+                        try:
+                            # если ссылка на википедию, то быстрее будет загружать текст статьи при помощи API
+                            if "wikipedia" in url_to_process.value:
+                                # получаем название статьи
+                                article_name = (url_to_process.value.split("/"))[-1].replace("_", " ")
+                                # получаем текст статьи
+                                text = wikipedia.page(article_name).summary
+                            else:
+                                req = Request(url_to_process.value, headers={'User-Agent': "Magic Browser"})
+                                text = text_from_html(urlopen(req, timeout=3).read())
+                            ShildFromURLText.objects.bulk_create(
+                                [ShildFromURLText(**{'value': m, 'url': url_to_process}) for m in get_shilds(text)])
+                        except:
+                            pass
 
                     # перебираем шилды загруженного текста
                     for founded_shild in ShildFromURLText.objects.all().filter(url=url_to_process):
