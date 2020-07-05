@@ -129,7 +129,7 @@ def process_urls_body(request, add_paper_conf, start_time):
         print("loop shilds")
         # перебираем шилды загруженного текста
         for found_shild in ShildFromURLText.objects.all().filter(url=url_to_process, author=request.user):
-            print(found_shild.value)
+            #print(found_shild.value)
             # если превышено максимальное время выполнения скрипта
             if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
                 # рассчитываем процент загрузки
