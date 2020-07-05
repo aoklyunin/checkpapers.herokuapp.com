@@ -24,12 +24,22 @@ class AddPaperConf(models.Model):
     text = UnlimitedCharField(default="")
     # название статьи
     name = UnlimitedCharField(default="")
+    # начальное времяDate
+    start_time = models.DateTimeField(auto_now=True, auto_now_add=False)
+    # кол-во сайтов для проверки
+    check_url_cnt = models.IntegerField(default=0)
+    # пользователь, добавляющий статью
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
 
 
 # URL для добавления
 class UrlToProcess(models.Model):
     # значение
     value = UnlimitedCharField(default="")
+    # пользователь, создавший шилды
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    # флаг, что проверка не удалась
+    flg_process_error = models.BooleanField(default=False)
 
 
 # шилд для добавления
@@ -38,3 +48,22 @@ class ShildToProcess(models.Model):
     value = UnlimitedCharField(default="")
     # флаг, нужно ли удалять во время поиска ссылок
     to_delete = models.BooleanField(default=False)
+    # пользователь, создавший шилды
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    # сколько раз найден данный шилд в статьях
+    founded_cnt = models.IntegerField(default=0)
+
+
+# ещё не использованные для обработки статьи
+class NotUsedPaper(models.Model):
+    # статья
+    paper = models.ForeignKey(Paper, on_delete=models.CASCADE, default=None)
+    # пользователь, создавший шилды
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+
+
+class ShildFromURLText(models.Model):
+    # текст шилда
+    value = UnlimitedCharField(default="")
+    # пользователь, создавший шилды
+    url = models.ForeignKey(UrlToProcess, on_delete=models.CASCADE, default=None)

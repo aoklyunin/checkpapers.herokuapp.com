@@ -146,17 +146,39 @@ function load(data){
         function(msg){
             if (msg["state"]=="needCaptcha"){
                 hideProgress();
+                $('.process-text').text(msg["process-text"]);
                 setCaptcha(msg);
             }else if (msg["state"]=="loadNext"){
                 $('.process-text').text(msg["process-text"]);
                 load({'state':'continue'});
             }else{
-                window.location ='/process_urls';
+                $('.process-text').text("Обработка найденных текстов...");
+                process({"state":"start"});
             }
         }
     );
 }
 
+function process(data){
+    $.post(
+        '/process_urls',
+        data,
+        function(msg){
+            if (msg["state"]=="processPaperNext"){
+                $('.process-text').text(msg["process-text"]);
+                process({'state':'processPapers'});
+            }else if ( (msg["state"]=="completeProcessPaper")|| (msg["state"]=="processUrlNext")){
+                  $('.process-text').text(msg["process-text"]);
+                 process({'state':'processUrls'});
+            }else if (msg["state"]=="completeUrl"){
+                $('.process-text').text(msg["process-text"]);
+                process({'state':'create'});
+            }else{
+                window.location ='/personal';
+            }
+        }
+    );
+}
 function setCaptcha(msg){
     $("#captcha-img").attr("src",msg["captcha"]),
     $("#captcha-form__text").val(""),

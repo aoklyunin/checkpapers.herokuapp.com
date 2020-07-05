@@ -1,16 +1,22 @@
 # -*- coding: utf-8 -*-
 import os
 import time
+import wikipedia
 from django.db import connection
 from urllib.parse import urlencode
 from django.contrib import messages
 from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
+from django.utils.timezone import now
+from urllib.request import urlopen, Request
 from selenium import webdriver
 from main.forms import PaperForm
-from misc.check_papers import check_paper, get_shilds
-from .models import Paper, AddPaperConf, ShildToProcess, UrlToProcess
+from misc.check_papers import get_shilds, text_from_html, TRUTH_SHILD_CNT
+from .models import Paper, AddPaperConf, ShildToProcess, UrlToProcess, NotUsedPaper, ShildFromURLText
+
+# максимальное время выполнения скрипта у heroku ограничение на время ответа 30, берём с запасом 20
+MAX_SCRIPT_PROCESS_TIME = 20
 
 
 # главная страница
@@ -46,16 +52,29 @@ def check(request):
                     messages.error(request, "Статья содержит слдишком мало слов")
                     return JsonResponse({"state": "formError"})
                 # на всякий случай удаляем все параметры
-                AddPaperConf.objects.all().delete()
+                AddPaperConf.objects.all().filter(author=request.user).delete()
+
                 # создаём параметры добавления статьи
                 AddPaperConf.objects.create(
                     text=form.cleaned_data["text"],
-                    name=form.cleaned_data["name"]
+                    name=form.cleaned_data["name"],
+                    author=request.user,
+                    start_time=now()
                 )
-                ShildToProcess.objects.all().delete()
-                UrlToProcess.objects.all().delete()
-                ShildToProcess.objects.bulk_create([ShildToProcess(**{'value': m, 'to_delete': False}) for m in shilds])
-                ShildToProcess.objects.bulk_create([ShildToProcess(**{'value': m, 'to_delete': True}) for m in shilds])
+                ShildToProcess.objects.all().filter(author=request.user).delete()
+                UrlToProcess.objects.all().filter(author=request.user).delete()
+                ShildToProcess.objects.bulk_create([ShildToProcess(**{
+                    'value': m,
+                    'to_delete': False,
+                    'author': request.user,
+                    'founded_cnt': 0
+                }) for m in shilds])
+                ShildToProcess.objects.bulk_create([ShildToProcess(**{
+                    'value': m,
+                    'to_delete': True,
+                    'author': request.user,
+                    'founded_cnt': 0
+                }) for m in shilds])
                 return JsonResponse({"state": "readyToLoad"})
         else:
             # перезагружаем страницу
@@ -117,30 +136,29 @@ def load_urls(request):
         # множество ссылок
         urls = set()
         # добавляем в него список всех уже сохранённых ссылок
-        urls.update([url_to_process.value for url_to_process in UrlToProcess.objects.all()])
+        urls.update([url_to_process.value for url_to_process in UrlToProcess.objects.all().filter(author=request.user)])
 
-        # перебираем необработанные шилды(начинаются с номера currentShild)
-        shilds_to_load = [
-            {"value": shild.value, "pk": shild.pk} for shild in ShildToProcess.objects.all().filter(to_delete=True)
-        ]
+        # получаем общее кол-во шилдов статьи
         shild_cnt = len(ShildToProcess.objects.all().filter(to_delete=False))
-        load_percent = float(shild_cnt - len(shilds_to_load)) / shild_cnt * 100
-        for shild in shilds_to_load:
-            # если с начала запроса прошло больше 25 секунд(у heroku ограничение на время ответа 30, берём с запасом)
-            if time.time() - start_time > 25:
+        # перебираем необработанные шилды(начинаются с номера currentShild)
+        for shild in ShildToProcess.objects.all().filter(to_delete=True):
+            # если превышено максимальное время выполнения скрипта
+            if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
                 # сохраняем уже обработанные ссылки
-                UrlToProcess.objects.all().delete()
-                UrlToProcess.objects.bulk_create([UrlToProcess(**{'value': m}) for m in urls])
+                UrlToProcess.objects.all().filter(author=request.user).delete()
+                UrlToProcess.objects.bulk_create([UrlToProcess(**{'value': m, 'author': request.user}) for m in urls])
                 # сохраняем куки
                 request.session["driver-cookies"] = driver.get_cookies()
                 driver.quit()
+                shilds_to_load_cnt = len(ShildToProcess.objects.all().filter(to_delete=True))
+                load_percent = float(shild_cnt - shilds_to_load_cnt) / shild_cnt * 100
                 return JsonResponse({
                     "state": "loadNext",
                     "process-text": "Поиск текстов: " + f"{load_percent:.{1}f}%".format(load_percent)
                 })
 
             if not flg_get_captcha:
-                query = urlencode({'text': '"' + shild["value"] + '"'})
+                query = urlencode({'text': '"' + shild.value + '"'})
                 url = "http://yandex.ru/search"
                 driver.get(url + '?' + query)
 
@@ -149,8 +167,8 @@ def load_urls(request):
             # если нашли картинку
             if len(captcha_imgs) > 0:
                 # сохраняем уже обработанные ссылки
-                UrlToProcess.objects.all().delete()
-                UrlToProcess.objects.bulk_create([UrlToProcess(**{'value': m}) for m in urls])
+                UrlToProcess.objects.all().filter(author=request.user).delete()
+                UrlToProcess.objects.bulk_create([UrlToProcess(**{'value': m, 'author': request.user}) for m in urls])
                 # сохраняем куки
                 request.session["driver-cookies"] = driver.get_cookies()
                 # получаем параметры капчи
@@ -159,8 +177,11 @@ def load_urls(request):
                 retpath = driver.find_element_by_xpath("//*[@class='form__retpath']").get_attribute("value")
                 driver_url = driver.current_url
                 driver.quit()
+                shilds_to_load_cnt = len(ShildToProcess.objects.all().filter(to_delete=True))
+                load_percent = float(shild_cnt - shilds_to_load_cnt) / shild_cnt * 100
                 return JsonResponse({
                     "state": "needCaptcha",
+                    "process-text": "Поиск текстов: " + f"{load_percent:.{1}f}%".format(load_percent),
                     "captcha": captcha,
                     "url": driver_url,
                     "key": key,
@@ -170,13 +191,13 @@ def load_urls(request):
             for link in driver.find_elements_by_xpath('//a'):
                 # добавляем только те, которые ссылаются не на яндекс
                 str_link = str(link.get_attribute("href"))
-                if (not "yandex" in str_link) and (not "bing" in str_link) and (not "google" in str_link) and (
-                        not "mail" in str_link) and (str_link is not None):
+                if ("yandex" not in str_link) and ("bing" not in str_link) and ("google" not in str_link) and (
+                        "mail" not in str_link) and (str_link is not None):
                     urls.add(str_link)
-            ShildToProcess.objects.get(pk=shild["pk"]).delete()
+            shild.delete()
         # сохраняем уже обработанные ссылки
-        UrlToProcess.objects.all().delete()
-        UrlToProcess.objects.bulk_create([UrlToProcess(**{'value': m}) for m in urls])
+        UrlToProcess.objects.all().filter(author=request.user).delete()
+        UrlToProcess.objects.bulk_create([UrlToProcess(**{'value': m, 'author': request.user}) for m in urls])
         return JsonResponse({"state": "ready"})
     else:
         messages.error(request, "этот метод можно вызывать только через POST запрос")
@@ -185,30 +206,167 @@ def load_urls(request):
 
 # обработка загруженных ссылок
 def process_urls(request):
-    [u, t] = check_paper(
-        [shild.value for shild in ShildToProcess.objects.all().filter(to_delete=False)],
-        [url_to_process.value for url_to_process in UrlToProcess.objects.all()]
-    )
-    # из-за долгого времени ожидания соединение обрывается
-    # нужно его перезапускать
-    connection.connect()
-    # очищаем списки
-    ShildToProcess.objects.all().delete()
-    UrlToProcess.objects.all().delete()
-    add_paper_conf = AddPaperConf.objects.all().first()
-    # создаём запись о статье
-    Paper.objects.create(
-        name=add_paper_conf.name,
-        author=request.user,
-        text=add_paper_conf.text,
-        uniquenessPercent=u,
-        truth=t
-    )
-    # очищаем параметры добаления статьи
-    AddPaperConf.objects.all().delete()
-    messages.info(request, "Оригинальность текста: " + f"{u:.{1}f}%".format(
-        u) + ", правдоподобность: " + f"{t:.{1}f}%".format(t))
-    return HttpResponseRedirect("/personal")
+    # если post запрос
+    if request.method == 'POST':
+        # из-за долгого времени ожидания соединение обрывается
+        # нужно его перезапускать
+        connection.connect()
+        add_paper_conf = AddPaperConf.objects.get(author=request.user)
+
+        if request.POST["state"] == "start":
+            NotUsedPaper.objects.bulk_create(
+                [NotUsedPaper(**{'paper': paper, 'author': request.user}) for paper in Paper.objects.all()]
+            )
+            add_paper_conf.check_url_cnt = len(UrlToProcess.objects.all().filter(author=request.user))
+            add_paper_conf.save()
+            return JsonResponse({
+                "state": "processPaperNext",
+                "process-text": "Сверка с уже загруженными статьями..."
+            })
+
+        # время начала загрузки
+        start_time = time.time()
+        time_delta = (now() - add_paper_conf.start_time)
+        total_seconds = time_delta.total_seconds()
+
+        if total_seconds < 60 * 60:
+            if request.POST["state"] == "processPapers":
+                non_used_paper_cnt = len(NotUsedPaper.objects.all().filter(author=request.user))
+                paper_cnt = len(Paper.objects.all())
+                if paper_cnt == 0:
+                    return JsonResponse({
+                        "state": "completeProcessPaper",
+                        "process-text": "Сверка с сайтами..."
+                    })
+                load_percent = float(paper_cnt - non_used_paper_cnt) / paper_cnt * 100
+                not_used_papers = [not_used_paper for not_used_paper in NotUsedPaper.objects.all()]
+                for non_used_paper in not_used_papers:
+                    # если превышено максимальное время выполнения скрипта
+                    if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
+                        return JsonResponse({
+                            "state": "processPaperNext",
+                            "process-text": "Сверка с уже загруженными статьями: " + f"{load_percent:.{1}f}%".format(
+                                load_percent)
+                        })
+                    for founded_shild in get_shilds(non_used_paper.paper.text):
+                        try:
+                            current_shild_to_process = ShildToProcess.objects.get(
+                                author=request.user,
+                                to_delete=False,
+                                value=founded_shild
+                            )
+                            current_shild_to_process.founded_cnt = current_shild_to_process.founded_cnt + 1
+                            current_shild_to_process.save()
+                        except:
+                            pass
+                    non_used_paper.delete()
+                return JsonResponse({
+                    "state": "completeProcessPaper",
+                    "process-text": "Сверка с сайтами..."
+                })
+            if request.POST["state"] == "processUrls":
+                print("post: processUrls")
+                for url_to_process in UrlToProcess.objects.all().filter(author=request.user):
+                    print(url_to_process.value)
+                    # если превышено максимальное время выполнения скрипта
+                    if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
+                        load_percent = float(add_paper_conf.check_url_cnt - len(
+                            UrlToProcess.objects.all().filter(
+                                author=request.user))) / add_paper_conf.check_url_cnt * 100
+                        print("url time limit")
+                        return JsonResponse({
+                            "state": "processUrlNext",
+                            "process-text": "Сверка с сайтами: " + f"{load_percent:.{1}f}%".format(
+                                load_percent)
+                        })
+                    # если шилды для url не загружены
+                    if len(ShildFromURLText.objects.all().filter(url=url_to_process)) == 0:
+                        # если ссылка на википедию, то быстрее будет загружать текст статьи при помощи API
+                        if "wikipedia" in url_to_process.value:
+                            # получаем название статьи
+                            article_name = (url_to_process.value.split("/"))[-1].replace("_", " ")
+                            # получаем текст статьи
+                            text = wikipedia.page(article_name).summary
+                        else:
+                            # загружаем видимый текст со страницы
+                            req = Request(url_to_process.value, headers={'User-Agent': "Magic Browser"})
+                            text = text_from_html(urlopen(req, timeout=3).read())
+                        ShildFromURLText.objects.bulk_create(
+                            [ShildFromURLText(**{'value': m, 'url': url_to_process}) for m in get_shilds(text)])
+
+                    # перебираем шилды загруженного текста
+                    for founded_shild in ShildFromURLText.objects.all().filter(url=url_to_process):
+                        # если превышено максимальное время выполнения скрипта
+                        if time.time() - start_time > MAX_SCRIPT_PROCESS_TIME:
+                            load_percent = float(add_paper_conf.check_url_cnt - len(UrlToProcess.objects.all().filter(
+                                author=request.user))) / add_paper_conf.check_url_cnt * 100
+                            print("shild time limit " + str(
+                                len(ShildFromURLText.objects.all().filter(url=url_to_process))))
+                            return JsonResponse({
+                                "state": "processUrlNext",
+                                "process-text": "Сверка с сайтами: " + f"{load_percent:.{1}f}%".format(
+                                    load_percent)
+                            })
+                        try:
+                            current_shild_to_process = ShildToProcess.objects.get(
+                                author=request.user,
+                                to_delete=False,
+                                value=founded_shild
+                            )
+                            current_shild_to_process.founded_cnt = current_shild_to_process.founded_cnt + 1
+                            current_shild_to_process.save()
+                        except:
+                            pass
+                        founded_shild.delete()
+                    url_to_process.delete()
+
+                return JsonResponse({
+                    "state": "completeUrl",
+                    "process-text": "Сохранение результатов..."
+                })
+
+        # кол-во шилдов, которые были найдены
+        sum_u = 0
+        # кол-во шилдов, которые встретились хотя бы в трёх различных источниках
+        sum_t = 0
+        # считаем кол-во встреченных и правдоподобных шилдов
+        shilds = ShildToProcess.objects.all().filter(author=request.user, to_delete=False)
+        for shild in shilds:
+            if shild.founded_cnt > TRUTH_SHILD_CNT:
+                sum_t = sum_t + 1
+            if not shild.founded_cnt:
+                sum_u = sum_u + 1
+
+        # возвращаем уникальность и правдоподобность статьи
+        u = float(sum_u) / len(shilds) * 100
+        t = float(sum_t) / len(shilds) * 100
+
+        # очищаем списки
+        ShildToProcess.objects.all().filter(author=request.user).delete()
+        UrlToProcess.objects.all().filter(author=request.user).delete()
+
+        # создаём запись о статье
+        Paper.objects.create(
+            name=add_paper_conf.name,
+            author=request.user,
+            text=add_paper_conf.text,
+            uniquenessPercent=u,
+            truth=t
+        )
+
+        # очищаем параметры добаления статьи
+        try:
+            AddPaperConf.objects.get(author=request.user).delete()
+        except:
+            pass
+        messages.info(request, "Оригинальность текста: " + f"{u:.{1}f}%".format(
+            u) + ", правдоподобность: " + f"{t:.{1}f}%".format(t))
+        return JsonResponse({
+            "state": "ready",
+        })
+    else:
+        messages.error(request, "этот метод можно вызывать только через POST запрос")
+        return HttpResponseRedirect("personal")
 
 
 # страница "О проекте"
