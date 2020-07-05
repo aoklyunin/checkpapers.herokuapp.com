@@ -151,7 +151,7 @@ def process_urls_body(request, add_paper_conf, start_time):
                 # увеличиваем его счётчик на 1
                 current_shild_to_process.founded_cnt = current_shild_to_process.founded_cnt + 1
                 current_shild_to_process.save()
-                print("shild found")
+                #print("shild found")
             except:
                 pass
             found_shild.delete()
