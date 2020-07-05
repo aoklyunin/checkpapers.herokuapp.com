@@ -12,7 +12,8 @@ from selenium import webdriver
 from main.forms import PaperForm
 from main.process import process_urls_start, process_papers, process_urls_body, save_paper
 from misc.check_papers import get_shilds, MAX_SCRIPT_PROCESS_TIME
-from .models import Paper, AddPaperConf, ShildToProcess, UrlToProcess
+from .models import Paper, AddPaperConf, ShildToProcess, UrlToProcess, NotUsedPaper, ShildFromURLText, \
+    ShildFromNotUsedPaper
 
 
 # главная страница
@@ -61,6 +62,12 @@ def check(request):
                 ShildToProcess.objects.all().filter(author=request.user).delete()
                 # очищаем ссылки
                 UrlToProcess.objects.all().filter(author=request.user).delete()
+                # очищаем статьи для загрузки
+                NotUsedPaper.objects.all().filter(author=request.user).delete()
+                # очищаем шилды из ссылок
+                ShildFromURLText.objects.all().filter(author=request.user).delete()
+                # очищаем шилды из статей
+                ShildFromNotUsedPaper.objects.all().filter(author=request.user).delete()
                 # сохраняем шилды для поиска и последующего удаления
                 ShildToProcess.objects.bulk_create([ShildToProcess(**{
                     'value': m,
