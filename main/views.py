@@ -78,10 +78,11 @@ def load_urls(request):
         options = webdriver.ChromeOptions()
         # эта опция используется только для деплоя на heroku
         options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
-        options.add_argument('headless')
-        options.add_argument("disable-gpu")
-        options.add_argument('no-sandbox')
-        options.add_argument('disable-dev-shm-usage')
+        options.add_argument('--headless')
+        options.add_argument("--disable-gpu")
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--ignore-certificate-errors')
         # создаём драйвер
         driver = webdriver.Chrome(str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
 
@@ -132,9 +133,10 @@ def load_urls(request):
                 UrlToProcess.objects.bulk_create([UrlToProcess(**{'value': m}) for m in urls])
                 # сохраняем куки
                 request.session["driver-cookies"] = driver.get_cookies()
+                driver.quit()
                 return JsonResponse({
                     "state": "loadNext",
-                    "process-text": "Загрузка страниц: " + f"{load_percent:.{1}f}%".format(load_percent)
+                    "process-text": "Поиск текстов: " + f"{load_percent:.{1}f}%".format(load_percent)
                 })
 
             if not flg_get_captcha:
@@ -156,6 +158,7 @@ def load_urls(request):
                 key = driver.find_element_by_xpath("//*[@class='form__key']").get_attribute("value")
                 retpath = driver.find_element_by_xpath("//*[@class='form__retpath']").get_attribute("value")
                 driver_url = driver.current_url
+                driver.quit()
                 return JsonResponse({
                     "state": "needCaptcha",
                     "captcha": captcha,
