@@ -45,7 +45,7 @@
 {% endblock %}
 
 {%block modalBlock%}
-<div class="modal fade" id="captcha-form-modal" >
+<div class="modal fade" id="captcha-form-modal">
     <div class="modal-dialog">
         <div class="modal-content">
 
@@ -147,6 +147,9 @@ function load(data){
             if (msg["state"]=="needCaptcha"){
                 hideProgress();
                 setCaptcha(msg);
+            }else if (msg["state"]=="loadNext"){
+                $('.process-text').text(msg["process-text"]);
+                load({'state':'continue'});
             }else{
                 window.location ='/process_urls';
             }
@@ -170,6 +173,7 @@ $('body').on('show.bs.modal', function () {
 $('body').on('hidden.bs.modal', function () {
     $('.sticky-top').css('margin-left', 'auto');
 });
+
 
 </script>
 {% endblock %}

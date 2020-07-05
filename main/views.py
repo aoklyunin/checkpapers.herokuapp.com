@@ -18,10 +18,62 @@ def index(request):
     return render(request, "index.html")
 
 
+# проверка статьи
+def check(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect("/need_login")
+
+    # если post запрос
+    if request.method == 'POST':
+        # строим форму на основе запроса
+        form = PaperForm(request.POST)
+        # если форма заполнена корректно
+        if form.is_valid():
+            # проверяем, что у статьи есть текст
+            if form.cleaned_data["text"] == "":
+                # выводим сообщение и перезаполняем форму
+                messages.error(request, "Вы послали на проверку статью без текста")
+                return HttpResponseRedirect("check")
+            # проверяем, что у статьи есть название
+            elif form.cleaned_data["name"] == "":
+                # выводим сообщение и перезаполняем форму
+                messages.error(request, "Вы послали на проверку статью без названия")
+                return HttpResponseRedirect("check")
+            # проверяем, что у в статье достаточное кол-во слов
+            else:
+                shilds = get_shilds(form.cleaned_data["text"])
+                if len(shilds) == 0:
+                    messages.error(request, "Статья содержит слдишком мало слов")
+                    return JsonResponse({"state": "formError"})
+                # на всякий случай удаляем все параметры
+                AddPaperConf.objects.all().delete()
+                # создаём параметры добавления статьи
+                AddPaperConf.objects.create(
+                    text=form.cleaned_data["text"],
+                    name=form.cleaned_data["name"]
+                )
+                ShildToProcess.objects.all().delete()
+                UrlToProcess.objects.all().delete()
+                ShildToProcess.objects.bulk_create([ShildToProcess(**{'value': m, 'to_delete': False}) for m in shilds])
+                ShildToProcess.objects.bulk_create([ShildToProcess(**{'value': m, 'to_delete': True}) for m in shilds])
+                return JsonResponse({"state": "readyToLoad"})
+        else:
+            # перезагружаем страницу
+            messages.error(request, "Неправильно заполнена форма")
+            return HttpResponseRedirect("check")
+    else:
+        # возвращаем простое окно регистрации
+        return render(request, "check.html", {
+            'form': PaperForm()
+        })
+
+
 # загрузить ссылки на статьи
 def load_urls(request):
     # если post запрос
     if request.method == 'POST':
+        # время начала загрузки
+        start_time = time.time()
         # опции веб-драйвера
         options = webdriver.ChromeOptions()
         # эта опция используется только для деплоя на heroku
@@ -54,6 +106,12 @@ def load_urls(request):
             input_elem.send_keys(request.POST["code"])
             submit = driver.find_element_by_xpath("/html/body/div/form/button")
             submit.click()
+        # если мы продолжаем загрузку
+        elif request.POST["state"] == "continue":
+            # восстанавливаем куки
+            driver.get('http://yandex.ru/')
+            for cookie in request.session["driver-cookies"]:
+                driver.add_cookie(cookie)
 
         # множество ссылок
         urls = set()
@@ -61,14 +119,29 @@ def load_urls(request):
         urls.update([url_to_process.value for url_to_process in UrlToProcess.objects.all()])
 
         # перебираем необработанные шилды(начинаются с номера currentShild)
-        shilds = [
+        shilds_to_load = [
             {"value": shild.value, "pk": shild.pk} for shild in ShildToProcess.objects.all().filter(to_delete=True)
         ]
-        for shild in shilds:
+        shild_cnt = len(ShildToProcess.objects.all().filter(to_delete=False))
+        load_percent = float(shild_cnt - len(shilds_to_load)) / shild_cnt * 100
+        for shild in shilds_to_load:
+            # если с начала запроса прошло больше 25 секунд(у heroku ограничение на время ответа 30, берём с запасом)
+            if time.time() - start_time > 25:
+                # сохраняем уже обработанные ссылки
+                UrlToProcess.objects.all().delete()
+                UrlToProcess.objects.bulk_create([UrlToProcess(**{'value': m}) for m in urls])
+                # сохраняем куки
+                request.session["driver-cookies"] = driver.get_cookies()
+                return JsonResponse({
+                    "state": "loadNext",
+                    "process-text": "Загрузка страниц: " + f"{load_percent:.{1}f}%".format(load_percent)
+                })
+
             if not flg_get_captcha:
                 query = urlencode({'text': '"' + shild["value"] + '"'})
                 url = "http://yandex.ru/search"
                 driver.get(url + '?' + query)
+
             # ищем картинку с капчей
             captcha_imgs = driver.find_elements_by_xpath("//div[@class='captcha__image']/img")
             # если нашли картинку
@@ -133,56 +206,6 @@ def process_urls(request):
     messages.info(request, "Оригинальность текста: " + f"{u:.{1}f}%".format(
         u) + ", правдоподобность: " + f"{t:.{1}f}%".format(t))
     return HttpResponseRedirect("/personal")
-
-
-# проверка статьи
-def check(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect("/need_login")
-
-    # если post запрос
-    if request.method == 'POST':
-        # строим форму на основе запроса
-        form = PaperForm(request.POST)
-        # если форма заполнена корректно
-        if form.is_valid():
-            # проверяем, что у статьи есть текст
-            if form.cleaned_data["text"] == "":
-                # выводим сообщение и перезаполняем форму
-                messages.error(request, "Вы послали на проверку статью без текста")
-                return HttpResponseRedirect("check")
-            # проверяем, что у статьи есть название
-            elif form.cleaned_data["name"] == "":
-                # выводим сообщение и перезаполняем форму
-                messages.error(request, "Вы послали на проверку статью без названия")
-                return HttpResponseRedirect("check")
-            # проверяем, что у в статье достаточное кол-во слов
-            else:
-                shilds = get_shilds(form.cleaned_data["text"])
-                if len(shilds) == 0:
-                    messages.error(request, "Статья содержит слдишком мало слов")
-                    return JsonResponse({"state": "formError"})
-                # на всякий случай удаляем все параметры
-                AddPaperConf.objects.all().delete()
-                # создаём параметры добавления статьи
-                AddPaperConf.objects.create(
-                    text=form.cleaned_data["text"],
-                    name=form.cleaned_data["name"]
-                )
-                ShildToProcess.objects.all().delete()
-                UrlToProcess.objects.all().delete()
-                ShildToProcess.objects.bulk_create([ShildToProcess(**{'value': m, 'to_delete': False}) for m in shilds])
-                ShildToProcess.objects.bulk_create([ShildToProcess(**{'value': m, 'to_delete': True}) for m in shilds])
-                return JsonResponse({"state": "readyToLoad"})
-        else:
-            # перезагружаем страницу
-            messages.error(request, "Неправильно заполнена форма")
-            return HttpResponseRedirect("check")
-    else:
-        # возвращаем простое окно регистрации
-        return render(request, "check.html", {
-            'form': PaperForm()
-        })
 
 
 # страница "О проекте"
