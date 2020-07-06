@@ -121,16 +121,16 @@ def check_paper_with_yandex_api(current_paper):
     # подключаем API яндекса
     yandex = yandex_search.Yandex(api_user='aoklyunin', api_key='03.210671841:b75fddc50ebc4d5938fc5c192bd47964')
     # создаём множество ссылок
-    url_list = set()
+    urls = set()
     # по каждому из шилдов получаем список ссылок на страницы, в которых он найден
     for shild in current_paper_shilds:
         try:
             search_urls = [str(result["url"]) for result in yandex.search('"' + shild + '"').items[:10]]
-            url_list.update(search_urls)
+            urls.update(search_urls)
             # у API есть ограничение на кол-во запросов в секунду, поэтому добавляем небольшую задержку
             time.sleep(0.05)
         except yandex_search.ConfigException:
             print("error search: используется ip адрес, не совпадающий с указанным в яндекс XML")
             return [-1, 0]
 
-    return check_paper(current_paper_shilds, url_list)
+    return check_paper(current_paper_shilds, urls)
