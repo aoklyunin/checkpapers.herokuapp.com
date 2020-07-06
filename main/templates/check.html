@@ -162,30 +162,24 @@ function load(data){
 function process(data){
     $.post(
         '/process_urls',
-        data,
-        function(msg){
+        data)
+        .done(function(msg){
             if (msg["state"]=="processPaperNext"){
                 $('.process-text').text(msg["process-text"]);
                 process({'state':'processPapers'});
             }else if ( (msg["state"]=="completeProcessPaper")|| (msg["state"]=="processUrlNext")){
                 $('.process-text').text(msg["process-text"]);
-                var flgComplete = false;
-                while (!flgComplete){
-                    try{
-                        process({'state':'processUrls'});
-                        flgComplete = true;
-                    }catch (e) {
-
-                    }
-                }
+                process({'state':'processUrls'});
             }else if (msg["state"]=="completeUrl"){
                 $('.process-text').text(msg["process-text"]);
                 process({'state':'create'});
             }else{
                 window.location ='/personal';
             }
-        }
-    );
+        })
+        .fail(function(xhr, textStatus, errorThrown) {
+            process(data);
+        });
 }
 function setCaptcha(msg){
     $("#captcha-img").attr("src",msg["captcha"]),
