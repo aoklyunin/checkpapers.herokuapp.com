@@ -126,7 +126,7 @@ def process_urls_body(request, add_paper_conf, start_time):
             except:
                 pass
 
-        print("loop shilds")
+        print("loop shilds "+str(len(ShildFromURLText.objects.all().filter(url=url_to_process, author=request.user))))
         # перебираем шилды загруженного текста
         for found_shild in ShildFromURLText.objects.all().filter(url=url_to_process, author=request.user):
             # print(found_shild.value)
